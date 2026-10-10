@@ -4,8 +4,15 @@ const elements = {
   activeUntil: $("#active-until"),
   airplayDot: $("#airplay-dot"),
   airplayStatus: $("#airplay-status"),
+  audioFile: $("#audio-file"),
+  audioFileLabel: $("#audio-file-label"),
+  audioMode: [...document.querySelectorAll('input[name="audio-mode"]')],
+  audioUploadForm: $("#audio-upload-form"),
   announcementText: $("#announcement-text"),
   cooldown: $("#cooldown"),
+  currentAudio: $("#current-audio"),
+  currentAudioName: $("#current-audio-name"),
+  customAudioPlayer: $("#custom-audio-player"),
   enabled: $("#enabled"),
   lastError: $("#last-error"),
   lastEvent: $("#last-event"),
@@ -26,7 +33,10 @@ const elements = {
   timeGrid: $("#time-grid"),
   ttsDot: $("#tts-dot"),
   ttsStatus: $("#tts-status"),
+  ttsPanel: $("#tts-panel"),
   useAll: $("#use-all"),
+  uploadAudio: $("#upload-audio"),
+  uploadPanel: $("#upload-panel"),
   volume: $("#volume"),
   volumeValue: $("#volume-value"),
 };
@@ -65,6 +75,16 @@ function setStatus(dot, label, connected, good, bad) {
 
 function selectedOutputIds() {
   return [...document.querySelectorAll(".output-checkbox:checked")].map((item) => item.value);
+}
+
+function selectedAudioMode() {
+  return elements.audioMode.find((input) => input.checked)?.value || "tts";
+}
+
+function showAudioMode(mode) {
+  const upload = mode === "upload";
+  elements.ttsPanel.classList.toggle("hidden", upload);
+  elements.uploadPanel.classList.toggle("hidden", !upload);
 }
 
 function renderOutputs(outputs, settings) {
@@ -108,6 +128,8 @@ function renderOutputs(outputs, settings) {
 function applyForm(settings) {
   elements.enabled.checked = settings.enabled;
   elements.announcementText.value = settings.announcementText;
+  elements.audioMode.forEach((input) => (input.checked = input.value === settings.audioMode));
+  showAudioMode(settings.audioMode);
   elements.textCount.textContent = `${settings.announcementText.length} / 240`;
   elements.useAll.checked = settings.useAllOutputs;
   elements.volume.value = settings.volume;
@@ -125,7 +147,19 @@ function renderStatus(data) {
   if (data.outputs.length) lastKnownOutputs = data.outputs;
   setStatus(elements.mqttDot, elements.mqttStatus, data.mqttConnected, "Verbunden", "Nicht verbunden");
   setStatus(elements.airplayDot, elements.airplayStatus, data.ownToneConnected, `${outputs.length} gefunden`, "Nicht erreichbar");
-  setStatus(elements.ttsDot, elements.ttsStatus, data.ttsReady, "Ansage bereit", "Wird vorbereitet");
+  const activeAudioReady =
+    data.settings.audioMode === "upload" ? Boolean(data.customAudioUrl) : data.ttsReady;
+  const audioLabel =
+    data.settings.audioMode === "upload"
+      ? data.settings.customAudioOriginalName || "Eigene Datei"
+      : "Lokale Stimme bereit";
+  setStatus(elements.ttsDot, elements.ttsStatus, activeAudioReady, audioLabel, "Wird vorbereitet");
+  elements.currentAudio.classList.toggle("hidden", !data.customAudioUrl);
+  elements.currentAudioName.textContent = data.settings.customAudioOriginalName || "–";
+  if (data.customAudioUrl) {
+    const nextSource = `${data.customAudioUrl}?v=${encodeURIComponent(data.settings.customAudioFilename)}`;
+    if (!elements.customAudioPlayer.src.endsWith(nextSource)) elements.customAudioPlayer.src = nextSource;
+  }
   elements.lastEvent.textContent = formatDate(data.lastEventAt);
   elements.lastOutcome.textContent = data.lastEventOutcome || "Noch kein Ereignis";
   elements.lastPlayback.textContent = formatDate(data.lastPlaybackAt);
@@ -157,6 +191,15 @@ elements.announcementText.addEventListener("input", () => {
   markDirty();
   elements.textCount.textContent = `${elements.announcementText.value.length} / 240`;
 });
+elements.audioMode.forEach((input) => {
+  input.addEventListener("change", () => {
+    markDirty();
+    showAudioMode(selectedAudioMode());
+  });
+});
+elements.audioFile.addEventListener("change", () => {
+  elements.audioFileLabel.textContent = elements.audioFile.files[0]?.name || "Audiodatei auswählen";
+});
 elements.volume.addEventListener("input", () => {
   markDirty();
   elements.volumeValue.textContent = `${elements.volume.value} %`;
@@ -178,6 +221,32 @@ for (const element of [elements.enabled, elements.activeFrom, elements.activeUnt
 }
 elements.outputs.addEventListener("change", markDirty);
 
+elements.audioUploadForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!elements.audioFile.files.length) {
+    showNotice("Wähle zuerst eine Audiodatei aus.");
+    return;
+  }
+  elements.uploadAudio.disabled = true;
+  elements.uploadAudio.textContent = "Wird hochgeladen …";
+  try {
+    const result = await api("/api/custom-audio", {
+      method: "POST",
+      body: new FormData(elements.audioUploadForm),
+    });
+    elements.audioUploadForm.reset();
+    elements.audioFileLabel.textContent = "Audiodatei auswählen";
+    formDirty = false;
+    showNotice(`„${result.originalName}“ wurde hochgeladen und ausgewählt.`, true);
+    await loadStatus({ quiet: true, forceForm: true });
+  } catch (error) {
+    showNotice(error.message);
+  } finally {
+    elements.uploadAudio.disabled = false;
+    elements.uploadAudio.textContent = "Datei hochladen";
+  }
+});
+
 elements.save.addEventListener("click", async () => {
   elements.save.disabled = true;
   elements.save.textContent = "Ansage wird vorbereitet …";
@@ -189,6 +258,7 @@ elements.save.addEventListener("click", async () => {
         activeFrom: elements.activeFrom.value,
         activeUntil: elements.activeUntil.value,
         announcementText: elements.announcementText.value,
+        audioMode: selectedAudioMode(),
         cooldownSeconds: Number(elements.cooldown.value),
         enabled: elements.enabled.checked,
         scheduleEnabled: elements.scheduleEnabled.checked,

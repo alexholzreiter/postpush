@@ -5,7 +5,10 @@ export const DEFAULT_SETTINGS = Object.freeze({
   activeFrom: "05:00",
   activeUntil: "22:00",
   announcementText: "Du hast Post bekommen.",
+  audioMode: "tts",
   cooldownSeconds: 30,
+  customAudioFilename: null,
+  customAudioOriginalName: null,
   enabled: true,
   scheduleEnabled: true,
   selectedOutputIds: [],
@@ -37,12 +40,21 @@ export function normalizeSettings(value = {}) {
     activeFrom: normalizeTime(value.activeFrom, DEFAULT_SETTINGS.activeFrom),
     activeUntil: normalizeTime(value.activeUntil, DEFAULT_SETTINGS.activeUntil),
     announcementText: normalizeText(value.announcementText),
+    audioMode: value.audioMode === "upload" ? "upload" : "tts",
     cooldownSeconds: numberInRange(
       value.cooldownSeconds,
       DEFAULT_SETTINGS.cooldownSeconds,
       1,
       600
     ),
+    customAudioFilename:
+      typeof value.customAudioFilename === "string" && value.customAudioFilename
+        ? path.basename(value.customAudioFilename)
+        : null,
+    customAudioOriginalName:
+      typeof value.customAudioOriginalName === "string" && value.customAudioOriginalName
+        ? path.basename(value.customAudioOriginalName).slice(0, 240)
+        : null,
     enabled: typeof value.enabled === "boolean" ? value.enabled : DEFAULT_SETTINGS.enabled,
     scheduleEnabled:
       typeof value.scheduleEnabled === "boolean"

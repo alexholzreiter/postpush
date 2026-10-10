@@ -11,6 +11,8 @@ test("web interface contains all primary controls and no remote assets", () => {
   for (const id of [
     "enabled",
     "announcement-text",
+    "audio-file",
+    "audio-upload-form",
     "use-all",
     "volume",
     "schedule-enabled",
@@ -24,4 +26,12 @@ test("web interface contains all primary controls and no remote assets", () => {
   }
   assert.doesNotMatch(html, /https?:\/\//);
   assert.doesNotMatch(css, /https?:\/\//);
+});
+
+test("custom audio upload supports common formats", () => {
+  const html = fs.readFileSync(path.join(root, "src/public/index.html"), "utf8");
+  const server = fs.readFileSync(path.join(root, "src/index.js"), "utf8");
+  assert.match(html, /\.mp3,\.wav,\.m4a,\.aac,\.flac,\.ogg/);
+  assert.match(server, /app\.post\("\/api\/custom-audio"/);
+  assert.match(server, /25 \* 1024 \* 1024/);
 });

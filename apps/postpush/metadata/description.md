@@ -3,7 +3,7 @@
 PostPush meldet neue Post mit einer gesprochenen Ansage auf deinen HomePods.
 
 - empfängt Briefkasten-Ereignisse von Home Assistant über MQTT
-- erzeugt den frei wählbaren deutschen Ansagetext lokal mit Piper
+- erzeugt den frei wählbaren deutschen Ansagetext lokal mit Piper oder spielt eine eigene Audiodatei ab
 - spielt synchron auf allen oder ausgewählten HomePods
 - bietet Hauptschalter, Ruhezeit, Lautstärke und Sperrzeit
 - sendet keine Sprachdaten an einen Cloud-Dienst

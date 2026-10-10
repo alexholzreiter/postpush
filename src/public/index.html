@@ -48,7 +48,7 @@
         <div class="status-strip">
           <div class="status-item"><span class="status-dot" id="mqtt-dot"></span><span><small>HOME ASSISTANT</small><strong id="mqtt-status">Wird geprüft …</strong></span></div>
           <div class="status-item"><span class="status-dot" id="airplay-dot"></span><span><small>AIRPLAY</small><strong id="airplay-status">Wird geprüft …</strong></span></div>
-          <div class="status-item"><span class="status-dot" id="tts-dot"></span><span><small>STIMME</small><strong id="tts-status">Wird geprüft …</strong></span></div>
+          <div class="status-item"><span class="status-dot" id="tts-dot"></span><span><small>AUDIO</small><strong id="tts-status">Wird geprüft …</strong></span></div>
         </div>
       </section>
 
@@ -72,13 +72,34 @@
           <article class="card settings-card">
             <header class="card-header">
               <span class="number">1</span>
-              <span><h3>Ansage</h3><p>Dieser Text wird lokal auf dem Mac mini gesprochen.</p></span>
+              <span><h3>Ansage</h3><p>Wähle eine lokale Stimme oder deine eigene Audiodatei.</p></span>
             </header>
-            <label class="field-label" for="announcement-text">Ansagetext</label>
-            <div class="text-field"><textarea id="announcement-text" maxlength="240" rows="3">Du hast Post bekommen.</textarea><span id="text-count">24 / 240</span></div>
-            <div class="privacy-note">
-              <svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.5 2.9 8.4 7 10 4.1-1.6 7-5.5 7-10V6z"/><path d="m9 12 2 2 4-5"/></svg>
-              Piper erzeugt die Sprache lokal. Der Text verlässt dein Netzwerk nicht.
+            <div class="audio-tabs" role="radiogroup" aria-label="Art der Ansage">
+              <label><input type="radio" name="audio-mode" value="tts" checked><span><svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/></svg>Text sprechen</span></label>
+              <label><input type="radio" name="audio-mode" value="upload"><span><svg viewBox="0 0 24 24"><path d="M9 18V5l10-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/></svg>Eigene Datei</span></label>
+            </div>
+            <div id="tts-panel" class="audio-panel">
+              <label class="field-label" for="announcement-text">Ansagetext</label>
+              <div class="text-field"><textarea id="announcement-text" maxlength="240" rows="3">Du hast Post bekommen.</textarea><span id="text-count">24 / 240</span></div>
+              <div class="privacy-note">
+                <svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.5 2.9 8.4 7 10 4.1-1.6 7-5.5 7-10V6z"/><path d="m9 12 2 2 4-5"/></svg>
+                Piper erzeugt die Sprache lokal. Der Text verlässt dein Netzwerk nicht.
+              </div>
+            </div>
+            <div id="upload-panel" class="audio-panel hidden">
+              <form id="audio-upload-form">
+                <label class="upload-drop" for="audio-file">
+                  <span class="upload-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg></span>
+                  <span><strong id="audio-file-label">Audiodatei auswählen</strong><small>MP3, WAV, M4A, AAC, FLAC oder OGG · maximal 25 MB</small></span>
+                  <input id="audio-file" name="audio" type="file" accept=".mp3,.wav,.m4a,.aac,.flac,.ogg,audio/*">
+                </label>
+                <button class="button upload" id="upload-audio" type="submit">Datei hochladen</button>
+              </form>
+              <div id="current-audio" class="current-audio hidden">
+                <span><svg viewBox="0 0 24 24"><path d="M9 18V5l10-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/></svg></span>
+                <div><small>AKTUELLE DATEI</small><strong id="current-audio-name">–</strong></div>
+                <audio id="custom-audio-player" controls preload="metadata"></audio>
+              </div>
             </div>
           </article>
 

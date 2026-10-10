@@ -6,10 +6,14 @@ PostPush ist eine selbst gehostete Briefkasten-Ansage für HomePods:
 Briefkastensensor → Home Assistant → MQTT → PostPush → HomePods
 ```
 
-Die App erzeugt einen frei wählbaren deutschen Ansagetext lokal mit Piper TTS
-und spielt ihn über OwnTone/AirPlay synchron auf allen oder ausgewählten
-HomePods ab. Die Weboberfläche verwaltet Hauptschalter, Zeitplan, Sperrzeit,
-Lautstärke und HomePod-Auswahl.
+Die App erzeugt wahlweise einen frei wählbaren deutschen Ansagetext lokal mit
+Piper TTS oder spielt eine eigene Audiodatei ab. OwnTone/AirPlay übernimmt die
+synchrone Wiedergabe auf allen oder ausgewählten HomePods. Die Weboberfläche
+verwaltet Hauptschalter, Audioquelle, Zeitplan, Sperrzeit, Lautstärke und
+HomePod-Auswahl.
+
+Eigene Ansagen können als MP3, WAV, M4A, AAC, FLAC oder OGG bis 25 MB direkt in
+der Weboberfläche hochgeladen und vorgehört werden.
 
 ## Voraussetzungen
 
@@ -71,6 +75,14 @@ docker compose up -d --build
 
 Danach ist die Weboberfläche unter `http://SERVER-IP:8586` erreichbar.
 Persistente Einstellungen und die erzeugte WAV-Datei liegen in `data/`.
+
+## Eigene Audiodatei
+
+Unter **Ansage → Eigene Datei** kann eine Datei hochgeladen werden. Der Upload
+wird im persistenten Runtipi-Datenverzeichnis gespeichert und automatisch als
+aktive Ansage ausgewählt. Ein späterer Wechsel zurück auf **Text sprechen**
+löscht die Datei nicht, sodass jederzeit zwischen beiden Varianten gewechselt
+werden kann.
 
 ## MQTT-Payload
 

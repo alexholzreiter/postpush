@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
 import mqtt from "mqtt";
+import multer from "multer";
 import { isAirPlayOutput, OwnToneClient, selectOutputIds } from "./owntone-client.js";
 import { evaluateMailEvent, isMailPayload } from "./schedule.js";
 import { createSettingsStore, normalizeSettings } from "./settings.js";
@@ -20,6 +21,7 @@ const MQTT_PASSWORD = process.env.MQTT_PASSWORD || undefined;
 const MQTT_TOPIC = process.env.MQTT_TOPIC || "postpush/events/mail";
 const ANNOUNCEMENT_FILENAME = "postpush-announcement.wav";
 const ANNOUNCEMENT_FILE = path.join(MEDIA_DIR, ANNOUNCEMENT_FILENAME);
+const ALLOWED_EXTENSIONS = new Set(["aac", "flac", "m4a", "mp3", "ogg", "wav"]);
 
 fs.mkdirSync(MEDIA_DIR, { recursive: true });
 const settingsStore = createSettingsStore(DATA_DIR);
@@ -101,13 +103,18 @@ async function playAnnouncement() {
   if (state.playbackActive) throw new Error("Eine Ansage läuft bereits.");
   state.playbackActive = true;
   try {
-    await ensureAnnouncement();
+    if (settings.audioMode === "tts") await ensureAnnouncement();
+    const activeFilename =
+      settings.audioMode === "upload" ? settings.customAudioFilename : ANNOUNCEMENT_FILENAME;
+    if (!activeFilename) throw new Error("Noch keine eigene Audiodatei hochgeladen.");
+    const activeFile = path.join(MEDIA_DIR, path.basename(activeFilename));
+    if (!fs.existsSync(activeFile)) throw new Error("Die ausgewählte Audiodatei wurde nicht gefunden.");
     const outputs = await getOwnToneOutputs();
     const outputIds = selectOutputIds(outputs, settings);
     if (!outputIds.length) {
       throw new Error("Keine ausgewählten, erreichbaren HomePods gefunden.");
     }
-    const track = await ownTone.findTrack(ANNOUNCEMENT_FILENAME);
+    const track = await ownTone.findTrack(activeFilename);
     await ownTone.playTrack(track, outputIds, settings.volume);
     state.lastPlaybackAt = new Date().toISOString();
     console.log(`Post-Ansage auf ${outputIds.length} AirPlay-Ausgang/Ausgängen gestartet.`);
@@ -192,6 +199,10 @@ mqttClient.on("message", (_topic, payload, packet) => {
 const app = express();
 app.use(express.json({ limit: "32kb" }));
 app.use(express.static(fileURLToPath(new URL("public", import.meta.url))));
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 25 * 1024 * 1024, files: 1 },
+});
 
 app.get("/api/status", async (_req, res) => {
   let outputs = [];
@@ -204,6 +215,7 @@ app.get("/api/status", async (_req, res) => {
   res.json({
     ...state,
     announcementUrl: state.ttsReady ? "/api/announcement" : null,
+    customAudioUrl: settings.customAudioFilename ? "/api/custom-audio" : null,
     mqttTopic: MQTT_TOPIC,
     outputs: airPlayOutputs.length ? airPlayOutputs : lastKnownAirPlayOutputs,
     outputsStale: !airPlayOutputs.length && lastKnownAirPlayOutputs.length > 0,
@@ -212,9 +224,17 @@ app.get("/api/status", async (_req, res) => {
 });
 
 app.put("/api/settings", async (req, res) => {
-  const candidate = normalizeSettings({ ...settings, ...req.body });
+  const candidate = normalizeSettings({
+    ...settings,
+    ...req.body,
+    customAudioFilename: settings.customAudioFilename,
+    customAudioOriginalName: settings.customAudioOriginalName,
+  });
   if (!candidate.useAllOutputs && !candidate.selectedOutputIds.length) {
     return res.status(400).json({ error: "Wähle mindestens einen HomePod aus." });
+  }
+  if (candidate.audioMode === "upload" && !candidate.customAudioFilename) {
+    return res.status(400).json({ error: "Lade zuerst eine eigene Audiodatei hoch." });
   }
   const textChanged = candidate.announcementText !== settings.announcementText;
   try {
@@ -243,6 +263,55 @@ app.get("/api/announcement", (_req, res) => {
   return res.sendFile(ANNOUNCEMENT_FILE);
 });
 
+app.post("/api/custom-audio", upload.single("audio"), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "Keine Audiodatei empfangen." });
+  const extension = path.extname(req.file.originalname).slice(1).toLowerCase();
+  if (!ALLOWED_EXTENSIONS.has(extension)) {
+    return res.status(415).json({ error: "Erlaubt sind MP3, WAV, M4A, AAC, FLAC und OGG." });
+  }
+
+  const filename = `postpush-custom-${Date.now()}.${extension}`;
+  const destination = path.join(MEDIA_DIR, filename);
+  const temporary = `${destination}.tmp`;
+  try {
+    fs.writeFileSync(temporary, req.file.buffer, { mode: 0o644 });
+    fs.renameSync(temporary, destination);
+    await ownTone.rescan();
+    await ownTone.findTrack(filename);
+    const previousFilename = settings.customAudioFilename;
+    settings = settingsStore.write({
+      ...settings,
+      audioMode: "upload",
+      customAudioFilename: filename,
+      customAudioOriginalName: req.file.originalname,
+    });
+    if (previousFilename && previousFilename !== filename) {
+      fs.rmSync(path.join(MEDIA_DIR, path.basename(previousFilename)), { force: true });
+      void ownTone.rescan().catch(() => null);
+    }
+    state.ownToneConnected = true;
+    state.lastError = null;
+    return res.json({
+      filename,
+      ok: true,
+      originalName: settings.customAudioOriginalName,
+      settings,
+    });
+  } catch (error) {
+    fs.rmSync(temporary, { force: true });
+    fs.rmSync(destination, { force: true });
+    state.lastError = errorMessage(error);
+    return res.status(502).json({ error: state.lastError });
+  }
+});
+
+app.get("/api/custom-audio", (_req, res) => {
+  if (!settings.customAudioFilename) return res.sendStatus(404);
+  const filename = path.join(MEDIA_DIR, path.basename(settings.customAudioFilename));
+  if (!fs.existsSync(filename)) return res.sendStatus(404);
+  return res.sendFile(filename);
+});
+
 app.post("/api/outputs/:id/pair", async (req, res) => {
   const pin = String(req.body?.pin ?? "").trim();
   if (!/^\d{4}$/.test(pin)) {
@@ -269,6 +338,9 @@ app.get("/health", (_req, res) => {
 });
 
 app.use((error, _req, res, _next) => {
+  if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE") {
+    return res.status(413).json({ error: "Die Audiodatei darf höchstens 25 MB groß sein." });
+  }
   console.error("Unbehandelter Webfehler:", error);
   return res.status(500).json({ error: errorMessage(error) });
 });
