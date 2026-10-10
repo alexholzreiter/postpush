@@ -8,7 +8,7 @@ services:
     network_mode: host
     depends_on:
       owntone:
-        condition: service_started
+        condition: service_healthy
     environment:
       TZ: ${TZ:-Europe/Vienna}
       DATA_DIR: /data
@@ -24,7 +24,7 @@ services:
       - ./data:/data
 
   owntone:
-    image: docker.io/owntone/owntone:29.2
+    image: docker.io/owntone/owntone:29.3
     container_name: postpush-owntone
     restart: unless-stopped
     network_mode: host
@@ -59,11 +59,12 @@ services:
         OWNTONE_CONFIG
         chmod 0644 /data/owntone-config/owntone.conf
         chown -R "$${UID}:$${GID}" /data/media /data/owntone-cache /data/owntone-config
-        sed -i 's|^command_args=.*|command_args="-f"|' /etc/init.d/owntone
-        sed -i '/^command=/a supervisor="supervise-daemon"' /etc/init.d/owntone
-        sed -i '/^command=/a respawn_delay=3' /etc/init.d/owntone
-        sed -i '/^command=/a respawn_max=0' /etc/init.d/owntone
-        exec /sbin/init
+        adduser -D -g owntone -h /dev/null -s /sbin/nologin owntone 2>/dev/null || true
+        usermod -u "$${UID}" owntone 2>/dev/null || true
+        groupmod -g "$${GID}" owntone 2>/dev/null || true
+        rc-service dbus start
+        rc-service avahi-daemon start
+        exec /usr/sbin/owntone -f
     environment:
       UID: ${PUID:-1000}
       GID: ${PGID:-1000}
@@ -72,3 +73,9 @@ services:
       - ./data/owntone-config:/etc/owntone:ro
       - ./data/media:/srv/media
       - ./data/owntone-cache:/var/cache/owntone
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3690/api/config >/dev/null"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s

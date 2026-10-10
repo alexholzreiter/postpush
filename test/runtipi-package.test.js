@@ -68,3 +68,14 @@ test("PostPush ports do not collide with the Ring reference app", () => {
   assert.match(compose, /port = 3690/);
   assert.doesNotMatch(compose, /port = 3689/);
 });
+
+test("OwnTone starts without privileged OpenRC init and gates PostPush readiness", () => {
+  const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
+  assert.match(compose, /condition: service_healthy/);
+  assert.match(compose, /rc-service dbus start/);
+  assert.match(compose, /rc-service avahi-daemon start/);
+  assert.match(compose, /exec \/usr\/sbin\/owntone -f/);
+  assert.match(compose, /127\.0\.0\.1:3690\/api\/config/);
+  assert.doesNotMatch(compose, /privileged:/);
+  assert.doesNotMatch(compose, /exec \/sbin\/init/);
+});
