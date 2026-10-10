@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#f4efe5">
+    <title>PostPush</title>
+    <link rel="icon" href="/logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" type="module"></script>
+  </head>
+  <body>
+    <div class="page-glow glow-one"></div>
+    <div class="page-glow glow-two"></div>
+    <main class="shell">
+      <nav class="topbar">
+        <a class="brand" href="/" aria-label="PostPush Startseite">
+          <span class="brand-mark">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M11 16.5h26v22H11z"/><path d="M8 16.5 24 7l16 9.5M18 24h12M18 30h8"/></svg>
+          </span>
+          <span><strong>PostPush</strong><small>Mailbox announcer</small></span>
+        </a>
+        <div class="local-pill"><span></span>100 % lokal</div>
+      </nav>
+
+      <section class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow">DEIN BRIEFKASTEN · DEINE HOMEPODS</span>
+          <h1>Post ist<br><em>angekommen.</em></h1>
+          <p>Eine ruhige, lokale Ansage auf allen ausgewählten HomePods – genau dann, wenn du sie hören möchtest.</p>
+          <div class="hero-actions">
+            <button class="button primary" id="test-announcement" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7z"/></svg>
+              Testansage
+            </button>
+            <span class="hero-hint">Spielt auch während der Ruhezeit</span>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="sound-wave wave-a"></div>
+          <div class="sound-wave wave-b"></div>
+          <div class="pod"><span></span><i></i></div>
+          <div class="letter">
+            <svg viewBox="0 0 64 64"><path d="M9 17h46v32H9z"/><path d="m10 19 22 17 22-17"/></svg>
+          </div>
+        </div>
+        <div class="status-strip">
+          <div class="status-item"><span class="status-dot" id="mqtt-dot"></span><span><small>HOME ASSISTANT</small><strong id="mqtt-status">Wird geprüft …</strong></span></div>
+          <div class="status-item"><span class="status-dot" id="airplay-dot"></span><span><small>AIRPLAY</small><strong id="airplay-status">Wird geprüft …</strong></span></div>
+          <div class="status-item"><span class="status-dot" id="tts-dot"></span><span><small>STIMME</small><strong id="tts-status">Wird geprüft …</strong></span></div>
+        </div>
+      </section>
+
+      <section class="content-heading">
+        <div><span class="eyebrow dark">EINSTELLUNGEN</span><h2>So soll PostPush reagieren</h2></div>
+        <span class="save-note">Änderungen werden mit „Speichern“ übernommen</span>
+      </section>
+
+      <div id="notice" class="notice hidden" role="status"></div>
+
+      <section class="dashboard">
+        <div class="main-column">
+          <article class="card power-card">
+            <div class="card-icon orange">
+              <svg viewBox="0 0 24 24"><path d="M12 2v10M6.4 5.6a8 8 0 1 0 11.2 0"/></svg>
+            </div>
+            <div class="card-copy"><h3>HomePod-Ansagen</h3><p>Schaltet automatische Ansagen unabhängig von den Handy-Mitteilungen ein oder aus.</p></div>
+            <label class="switch"><input id="enabled" type="checkbox"><span></span></label>
+          </article>
+
+          <article class="card settings-card">
+            <header class="card-header">
+              <span class="number">1</span>
+              <span><h3>Ansage</h3><p>Dieser Text wird lokal auf dem Mac mini gesprochen.</p></span>
+            </header>
+            <label class="field-label" for="announcement-text">Ansagetext</label>
+            <div class="text-field"><textarea id="announcement-text" maxlength="240" rows="3">Du hast Post bekommen.</textarea><span id="text-count">24 / 240</span></div>
+            <div class="privacy-note">
+              <svg viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.5 2.9 8.4 7 10 4.1-1.6 7-5.5 7-10V6z"/><path d="m9 12 2 2 4-5"/></svg>
+              Piper erzeugt die Sprache lokal. Der Text verlässt dein Netzwerk nicht.
+            </div>
+          </article>
+
+          <article class="card settings-card">
+            <header class="card-header">
+              <span class="number">2</span>
+              <span><h3>HomePods</h3><p>Wähle alle oder nur einzelne AirPlay-Lautsprecher.</p></span>
+            </header>
+            <label class="all-row"><span><strong>Alle verfügbaren HomePods</strong><small>Neue HomePods werden automatisch einbezogen.</small></span><span class="check"><input id="use-all" type="checkbox"><i></i></span></label>
+            <div id="outputs" class="outputs"><p class="empty">Suche nach AirPlay-Lautsprechern …</p></div>
+            <div class="range-row">
+              <span><strong>Lautstärke</strong><small>Gilt nur für die Post-Ansage.</small></span>
+              <div class="range-control"><input id="volume" type="range" min="1" max="100" value="55"><output id="volume-value">55 %</output></div>
+            </div>
+          </article>
+
+          <article class="card settings-card">
+            <header class="card-header">
+              <span class="number">3</span>
+              <span><h3>Zeitplan & Sperrzeit</h3><p>Lege fest, wann automatische Ansagen erlaubt sind.</p></span>
+            </header>
+            <label class="schedule-toggle"><span><strong>Zeitplan verwenden</strong><small>Außerhalb des Fensters bleibt PostPush still.</small></span><span class="switch compact"><input id="schedule-enabled" type="checkbox"><span></span></span></label>
+            <div class="time-grid" id="time-grid">
+              <label><span>Aktiv ab</span><input id="active-from" type="time" value="05:00"></label>
+              <span class="time-arrow">→</span>
+              <label><span>Aktiv bis</span><input id="active-until" type="time" value="22:00"></label>
+              <label class="cooldown"><span>Sperrzeit</span><span class="input-suffix"><input id="cooldown" type="number" min="1" max="600" value="30"><i>Sek.</i></span></label>
+            </div>
+          </article>
+
+          <button class="button save" id="save" type="button">Einstellungen speichern</button>
+        </div>
+
+        <aside class="side-column">
+          <article class="card event-card">
+            <header><span><i></i>LIVE</span><button id="refresh" type="button" title="Aktualisieren" aria-label="Aktualisieren">↻</button></header>
+            <div class="event-illustration"><div class="mini-letter">✉</div><span></span><span></span></div>
+            <h3>Letzte Aktivität</h3>
+            <dl>
+              <div><dt>Post-Ereignis</dt><dd id="last-event">–</dd></div>
+              <div><dt>Ergebnis</dt><dd id="last-outcome">Noch kein Ereignis</dd></div>
+              <div><dt>Letzte Ansage</dt><dd id="last-playback">–</dd></div>
+            </dl>
+          </article>
+
+          <article class="card connection-card">
+            <h3>Verbindung</h3>
+            <dl>
+              <div><dt><span class="mini-dot purple"></span>MQTT-Topic</dt><dd id="mqtt-topic">–</dd></div>
+              <div><dt><span class="mini-dot blue"></span>HomePods</dt><dd id="output-count">0 gefunden</dd></div>
+              <div><dt><span class="mini-dot green"></span>Letzte Nachricht</dt><dd id="last-mqtt">–</dd></div>
+              <div><dt><span class="mini-dot red"></span>Fehler</dt><dd id="last-error">–</dd></div>
+            </dl>
+          </article>
+
+          <article class="tip-card">
+            <svg viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M8.2 14.5A7 7 0 1 1 16 14.4c-.8.7-1 1.4-1 2.1H9c0-.7-.1-1.4-.8-2z"/></svg>
+            <span><strong>Hinweis</strong><small>Eine AirPlay-Ansage kann laufende Musik auf dem HomePod kurz unterbrechen.</small></span>
+          </article>
+        </aside>
+      </section>
+
+      <footer><span>PostPush</span><span>Lokale Briefkasten-Ansagen für dein Zuhause</span></footer>
+    </main>
+  </body>
+</html>

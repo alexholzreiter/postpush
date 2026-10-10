@@ -1,0 +1,74 @@
+services:
+  postpush:
+    build:
+      context: .
+    image: postpush:local
+    container_name: postpush
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      owntone:
+        condition: service_started
+    environment:
+      TZ: ${TZ:-Europe/Vienna}
+      DATA_DIR: /data
+      MEDIA_DIR: /data/media
+      WEB_PORT: "8586"
+      OWNTONE_URL: http://127.0.0.1:3690
+      OWNTONE_MEDIA_PATH: /srv/media
+      MQTT_URL: ${MQTT_URL:-mqtt://192.168.1.27:1883}
+      MQTT_USERNAME: ${MQTT_USERNAME:-}
+      MQTT_PASSWORD: ${MQTT_PASSWORD:-}
+      MQTT_TOPIC: ${MQTT_TOPIC:-postpush/events/mail}
+    volumes:
+      - ./data:/data
+
+  owntone:
+    image: docker.io/owntone/owntone:29.2
+    container_name: postpush-owntone
+    restart: unless-stopped
+    network_mode: host
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        mkdir -p /data/media /data/owntone-cache /data/owntone-config
+        cat > /data/owntone-config/owntone.conf <<'OWNTONE_CONFIG'
+        general {
+          uid = "owntone"
+          logfile = "/dev/stdout"
+          loglevel = log
+          trusted_networks = { "localhost" }
+          ipv6 = no
+          cache_dir = "/var/cache/owntone"
+          speaker_autoselect = no
+          start_buffer_ms = 1000
+        }
+        library {
+          name = "PostPush"
+          port = 3690
+          directories = { "/srv/media" }
+        }
+        audio {
+          nickname = "Disabled"
+          type = "disabled"
+        }
+        mpd {
+          port = 0
+        }
+        OWNTONE_CONFIG
+        chmod 0644 /data/owntone-config/owntone.conf
+        chown -R "$${UID}:$${GID}" /data/media /data/owntone-cache /data/owntone-config
+        sed -i 's|^command_args=.*|command_args="-f"|' /etc/init.d/owntone
+        sed -i '/^command=/a supervisor="supervise-daemon"' /etc/init.d/owntone
+        sed -i '/^command=/a respawn_delay=3' /etc/init.d/owntone
+        sed -i '/^command=/a respawn_max=0' /etc/init.d/owntone
+        exec /sbin/init
+    environment:
+      UID: ${PUID:-1000}
+      GID: ${PGID:-1000}
+    volumes:
+      - ./data:/data
+      - ./data/owntone-config:/etc/owntone:ro
+      - ./data/media:/srv/media
+      - ./data/owntone-cache:/var/cache/owntone

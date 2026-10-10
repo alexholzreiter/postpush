@@ -1,0 +1,55 @@
+{
+  "name": "PostPush",
+  "id": "postpush",
+  "available": true,
+  "short_desc": "Spielt bei erkannter Post eine lokale Sprachansage auf deinen HomePods ab.",
+  "author": "Alexander Holzreiter",
+  "port": 8586,
+  "categories": ["automation", "utilities"],
+  "description": "Lokale MQTT-zu-AirPlay-Brücke für Briefkasten-Ansagen mit Piper TTS.",
+  "tipi_version": 1,
+  "version": "0.1.0",
+  "source": "https://github.com/alexholzreiter/postpush",
+  "exposable": false,
+  "dynamic_config": true,
+  "supported_architectures": ["amd64", "arm64"],
+  "form_fields": [
+    {
+      "type": "text",
+      "label": "MQTT-Broker",
+      "hint": "Adresse des MQTT-Brokers, zum Beispiel mqtt://192.168.1.27:1883",
+      "default": "mqtt://192.168.1.27:1883",
+      "min": 10,
+      "max": 300,
+      "required": true,
+      "env_variable": "MQTT_URL"
+    },
+    {
+      "type": "text",
+      "label": "MQTT-Benutzername",
+      "default": "postpush",
+      "min": 1,
+      "max": 100,
+      "required": true,
+      "env_variable": "MQTT_USERNAME"
+    },
+    {
+      "type": "password",
+      "label": "MQTT-Passwort",
+      "hint": "Das Passwort des eigenen PostPush-MQTT-Benutzers.",
+      "min": 8,
+      "max": 300,
+      "required": true,
+      "env_variable": "MQTT_PASSWORD"
+    },
+    {
+      "type": "text",
+      "label": "MQTT-Topic",
+      "default": "postpush/events/mail",
+      "min": 1,
+      "max": 200,
+      "required": true,
+      "env_variable": "MQTT_TOPIC"
+    }
+  ]
+}

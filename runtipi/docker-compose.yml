@@ -1,0 +1,76 @@
+services:
+  postpush:
+    image: ghcr.io/alexholzreiter/postpush:0.1.0
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      owntone:
+        condition: service_started
+    environment:
+      TZ: ${TZ}
+      DATA_DIR: /data
+      MEDIA_DIR: /data/media
+      WEB_PORT: "8586"
+      OWNTONE_URL: http://127.0.0.1:3690
+      OWNTONE_MEDIA_PATH: /srv/media
+      MQTT_URL: ${MQTT_URL}
+      MQTT_USERNAME: ${MQTT_USERNAME}
+      MQTT_PASSWORD: ${MQTT_PASSWORD}
+      MQTT_TOPIC: ${MQTT_TOPIC}
+    volumes:
+      - ${APP_DATA_DIR}/data:/data
+    x-runtipi:
+      is_main: true
+      internal_port: 8586
+
+  owntone:
+    image: docker.io/owntone/owntone:29.2
+    restart: unless-stopped
+    network_mode: host
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        mkdir -p /data/media /data/owntone-cache /data/owntone-config
+        cat > /data/owntone-config/owntone.conf <<'OWNTONE_CONFIG'
+        general {
+          uid = "owntone"
+          logfile = "/dev/stdout"
+          loglevel = log
+          trusted_networks = { "localhost" }
+          ipv6 = no
+          cache_dir = "/var/cache/owntone"
+          speaker_autoselect = no
+          start_buffer_ms = 1000
+        }
+        library {
+          name = "PostPush"
+          port = 3690
+          directories = { "/srv/media" }
+        }
+        audio {
+          nickname = "Disabled"
+          type = "disabled"
+        }
+        mpd {
+          port = 0
+        }
+        OWNTONE_CONFIG
+        chmod 0644 /data/owntone-config/owntone.conf
+        chown -R 1000:1000 /data/media /data/owntone-cache /data/owntone-config
+        sed -i 's|^command_args=.*|command_args="-f"|' /etc/init.d/owntone
+        sed -i '/^command=/a supervisor="supervise-daemon"' /etc/init.d/owntone
+        sed -i '/^command=/a respawn_delay=3' /etc/init.d/owntone
+        sed -i '/^command=/a respawn_max=0' /etc/init.d/owntone
+        exec /sbin/init
+    environment:
+      UID: "1000"
+      GID: "1000"
+    volumes:
+      - ${APP_DATA_DIR}/data:/data
+      - ${APP_DATA_DIR}/data/owntone-config:/etc/owntone:ro
+      - ${APP_DATA_DIR}/data/media:/srv/media
+      - ${APP_DATA_DIR}/data/owntone-cache:/var/cache/owntone
+
+x-runtipi:
+  schema_version: 2
