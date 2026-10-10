@@ -8,7 +8,7 @@
   "categories": ["automation", "utilities"],
   "description": "Lokale MQTT-zu-AirPlay-Brücke für Briefkasten-Ansagen mit Piper TTS.",
   "tipi_version": 2,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "source": "https://github.com/alexholzreiter/postpush",
   "exposable": false,
   "dynamic_config": true,

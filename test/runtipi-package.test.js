@@ -12,7 +12,13 @@ const packagedFiles = [
   "metadata/description.md",
   "metadata/logo.jpg",
   "metadata/logo.png",
-  "metadata/logo.svg",
+];
+
+const publicIcons = [
+  "app-icon.png",
+  "apple-touch-icon.png",
+  "favicon-32.png",
+  "favicon.ico",
 ];
 
 test("standalone and app-store packages stay identical", () => {
@@ -23,6 +29,18 @@ test("standalone and app-store packages stay identical", () => {
       `${filename} differs between Runtipi packages`
     );
   }
+});
+
+test("web app ships the requested icon and favicon assets", () => {
+  for (const filename of publicIcons) {
+    assert.equal(fs.existsSync(path.join(root, "src", "public", filename)), true, `${filename} is missing`);
+  }
+
+  const page = fs.readFileSync(path.join(root, "src", "public", "index.html"), "utf8");
+  assert.match(page, /href="\/favicon\.ico"/);
+  assert.match(page, /href="\/favicon-32\.png"/);
+  assert.match(page, /href="\/apple-touch-icon\.png"/);
+  assert.match(page, /src="\/app-icon\.png"/);
 });
 
 test("application, image and Runtipi versions stay synchronized", () => {
