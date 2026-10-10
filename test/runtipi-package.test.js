@@ -48,7 +48,7 @@ test("application, image and Runtipi versions stay synchronized", () => {
   const config = JSON.parse(fs.readFileSync(path.join(storeApp, "config.json"), "utf8"));
   const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
   assert.equal(config.version, version);
-  assert.equal(config.tipi_version, 4);
+  assert.equal(config.tipi_version, 5);
   assert.match(compose, new RegExp(`postpush:${version.replaceAll(".", "\\.")}`));
   assert.match(compose, /schema_version: 2/);
 });
@@ -70,13 +70,13 @@ test("PostPush ports do not collide with the Ring reference app", () => {
   assert.doesNotMatch(compose, /port = 3689/);
 });
 
-test("OwnTone starts without privileged OpenRC init and gates PostPush readiness", () => {
+test("OwnTone starts its required daemons without privileged OpenRC init", () => {
   const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
-  assert.match(compose, /condition: service_healthy/);
-  assert.match(compose, /rc-service dbus start/);
-  assert.match(compose, /rc-service avahi-daemon start/);
+  assert.match(compose, /condition: service_started/);
+  assert.match(compose, /dbus-daemon --system --fork/);
+  assert.match(compose, /avahi-daemon --daemonize/);
   assert.match(compose, /exec \/usr\/sbin\/owntone -f/);
-  assert.match(compose, /127\.0\.0\.1:3690\/api\/config/);
+  assert.doesNotMatch(compose, /healthcheck:/);
   assert.doesNotMatch(compose, /privileged:/);
   assert.doesNotMatch(compose, /exec \/sbin\/init/);
 });

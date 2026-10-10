@@ -5,7 +5,7 @@ services:
     network_mode: host
     depends_on:
       owntone:
-        condition: service_healthy
+        condition: service_started
     environment:
       TZ: ${TZ}
       DATA_DIR: /data
@@ -61,8 +61,10 @@ services:
         adduser -D -g owntone -h /dev/null -s /sbin/nologin owntone 2>/dev/null || true
         usermod -u 1000 owntone 2>/dev/null || true
         groupmod -g 1000 owntone 2>/dev/null || true
-        rc-service dbus start
-        rc-service avahi-daemon start
+        mkdir -p /run/dbus /run/avahi-daemon
+        dbus-uuidgen --ensure=/etc/machine-id
+        dbus-daemon --system --fork
+        avahi-daemon --daemonize
         exec /usr/sbin/owntone -f
     environment:
       UID: "1000"
@@ -72,12 +74,5 @@ services:
       - ${APP_DATA_DIR}/data/owntone-config:/etc/owntone:ro
       - ${APP_DATA_DIR}/data/media:/srv/media
       - ${APP_DATA_DIR}/data/owntone-cache:/var/cache/owntone
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3690/api/config >/dev/null"]
-      interval: 5s
-      timeout: 3s
-      retries: 12
-      start_period: 10s
-
 x-runtipi:
   schema_version: 2
