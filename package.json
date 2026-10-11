@@ -1,6 +1,6 @@
 {
   "name": "postpush",
-  "version": "0.2.16",
+  "version": "0.2.17",
   "private": true,
   "type": "module",
   "description": "Plays a local spoken mailbox announcement on selected HomePods.",

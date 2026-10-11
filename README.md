@@ -65,11 +65,11 @@ All application settings and audio files remain on the local server.
 - a Runtipi or Docker host on the same local network/VLAN as the HomePods
 - Apple Home: **Home Settings → Speakers & TV → Anyone On the Same Network**
 
-The Runtipi package runs its own OwnTone instance and registers it through the
-host's `avahi-daemon` over D-Bus, so the host needs a running avahi-daemon
-(`systemctl is-active avahi-daemon`). It does not depend on any other app and
-can run next to other OwnTone-based apps such as Ring HomePod Doorbell. The
-standalone Docker Compose setup starts its own avahi-daemon instead.
+For the current Runtipi package, Ring HomePod Doorbell must run on the same
+Runtipi host. PostPush reuses its OwnTone service: AirPlay 2 on HomePod OS 27
+needs the fixed PTP ports 319 and 320, so only one OwnTone instance can run per
+host. The standalone Docker Compose setup includes its own OwnTone service and
+does not require the DoorBell app.
 
 ## Reference hardware
 
@@ -104,10 +104,9 @@ PostPush then appears in the App Store. During installation, configure the
 MQTT broker URL, username, password, and topic. A dedicated MQTT account named
 `postpush` with read access to `postpush/events/mail` is recommended.
 
-The Runtipi package uses port `8586` for the web interface and its own OwnTone
-instance on ports `3690` (API) and `3691` (websocket). The app is intentionally
-not exposable through Runtipi and should remain available only on the trusted
-home network.
+The Runtipi package uses port `8586` for the web interface and connects to the
+shared OwnTone instance on port `3689`. The app is intentionally not exposable
+through Runtipi and should remain available only on the trusted home network.
 
 ## Connect Home Assistant
 
