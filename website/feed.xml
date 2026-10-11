@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>PostPush updates</title>
+    <link>https://postpush.klickwerk.digital/</link>
+    <description>Release updates for the self-hosted MQTT-to-AirPlay mailbox announcement bridge.</description>
+    <language>en</language>
+    <lastBuildDate>Sun, 11 Oct 2026 07:30:00 +0200</lastBuildDate>
+    <atom:link href="https://postpush.klickwerk.digital/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PostPush 0.2.9</title>
+      <link>https://github.com/alexholzreiter/postpush/releases/tag/v0.2.9</link>
+      <guid isPermaLink="true">https://github.com/alexholzreiter/postpush/releases/tag/v0.2.9</guid>
+      <pubDate>Sun, 11 Oct 2026 07:30:00 +0200</pubDate>
+      <description>Version 0.2.9 adds the public project website, an illustrated English README, English Runtipi metadata, and direct project-support links.</description>
+    </item>
+    <item>
+      <title>PostPush 0.2.8</title>
+      <link>https://github.com/alexholzreiter/postpush/releases/tag/v0.2.8</link>
+      <guid isPermaLink="true">https://github.com/alexholzreiter/postpush/releases/tag/v0.2.8</guid>
+      <pubDate>Sun, 11 Oct 2026 02:29:30 +0200</pubDate>
+      <description>Version 0.2.8 retries inactive AirPlay outputs through OwnTone's receiver toggle endpoint.</description>
+    </item>
+    <item>
+      <title>PostPush 0.2.7</title>
+      <link>https://github.com/alexholzreiter/postpush/releases/tag/v0.2.7</link>
+      <guid isPermaLink="true">https://github.com/alexholzreiter/postpush/releases/tag/v0.2.7</guid>
+      <pubDate>Sun, 11 Oct 2026 02:22:00 +0200</pubDate>
+      <description>Version 0.2.7 verifies HomePod activation before starting an announcement.</description>
+    </item>
+    <item>
+      <title>PostPush 0.2.6</title>
+      <link>https://github.com/alexholzreiter/postpush/releases/tag/v0.2.6</link>
+      <guid isPermaLink="true">https://github.com/alexholzreiter/postpush/releases/tag/v0.2.6</guid>
+      <pubDate>Sun, 11 Oct 2026 02:09:14 +0200</pubDate>
+      <description>Version 0.2.6 fixes OwnTone output-volume updates for selected AirPlay speakers.</description>
+    </item>
+    <item>
+      <title>PostPush 0.2.5</title>
+      <link>https://github.com/alexholzreiter/postpush/releases/tag/v0.2.5</link>
+      <guid isPermaLink="true">https://github.com/alexholzreiter/postpush/releases/tag/v0.2.5</guid>
+      <pubDate>Sun, 11 Oct 2026 01:49:58 +0200</pubDate>
+      <description>Version 0.2.5 introduces the polished mailbox-and-HomePod web interface.</description>
+    </item>
+    <item>
+      <title>PostPush 0.2.0</title>
+      <link>https://github.com/alexholzreiter/postpush/releases/tag/v0.2.0</link>
+      <guid isPermaLink="true">https://github.com/alexholzreiter/postpush/releases/tag/v0.2.0</guid>
+      <pubDate>Sun, 11 Oct 2026 00:52:08 +0200</pubDate>
+      <description>Version 0.2.0 adds uploaded audio announcements alongside local Piper text-to-speech.</description>
+    </item>
+  </channel>
+</rss>

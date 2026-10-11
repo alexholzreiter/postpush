@@ -1,11 +1,11 @@
 # PostPush
 
-PostPush meldet neue Post mit einer gesprochenen Ansage auf deinen HomePods.
+PostPush announces new mail on selected HomePods and AirPlay speakers.
 
-- empfängt Briefkasten-Ereignisse von Home Assistant über MQTT
-- erzeugt den frei wählbaren deutschen Ansagetext lokal mit Piper oder spielt eine eigene Audiodatei ab
-- spielt synchron auf allen oder ausgewählten HomePods
-- bietet Hauptschalter, Ruhezeit, Lautstärke und Sperrzeit
-- sendet keine Sprachdaten an einen Cloud-Dienst
+- receives mailbox events from Home Assistant through MQTT
+- generates any configured message locally with Piper or plays an uploaded audio file
+- plays in sync on all or selected AirPlay speakers
+- provides a master switch, active hours, volume, and duplicate-event cooldown
+- keeps speech, audio, event data, and settings on the local server
 
-Der Runtipi-Server und die HomePods müssen sich im selben lokalen Netzwerk befinden. Für AirPlay muss in Apple Home unter **Einstellungen des Zuhauses → Lautsprecher & TVs** der Zugriff aus demselben Netzwerk erlaubt sein.
+The current Runtipi package reuses the OwnTone service from **Ring HomePod Doorbell**, which must run on the same Runtipi host. This avoids a conflicting second mDNS stack. The server and speakers must be reachable on the same network, and Apple Home must allow speaker access for **Anyone On the Same Network**.

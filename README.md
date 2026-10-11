@@ -1,51 +1,95 @@
+<p align="center">
+  <img src="docs/postpush-hero.svg" alt="PostPush — mailbox announcements on HomePods" width="100%">
+</p>
+
+<p align="center">
+  <a href="https://postpush.klickwerk.digital/"><img alt="Website" src="https://img.shields.io/badge/Website-postpush.klickwerk.digital-ef5d35?style=for-the-badge"></a>
+  <a href="https://github.com/alexholzreiter/postpush/releases"><img alt="Release" src="https://img.shields.io/github/v/release/alexholzreiter/postpush?style=for-the-badge&color=6f56e7"></a>
+  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2aae78?style=for-the-badge"></a>
+  <a href="https://buy.stripe.com/00w8wOcsV8WHdr7apqaZi04"><img alt="Tip a coffee with Stripe" src="https://img.shields.io/badge/Tip%20a%20coffee-635BFF?style=for-the-badge&logo=stripe&logoColor=white"></a>
+</p>
+
 # PostPush
 
-PostPush ist eine selbst gehostete Briefkasten-Ansage für HomePods:
+PostPush is a self-hosted mailbox announcement bridge for HomePods:
 
 ```text
-Briefkastensensor → Home Assistant → MQTT → PostPush → HomePods
+Mailbox sensor → Home Assistant → MQTT → PostPush → HomePods
 ```
 
-Die App erzeugt wahlweise einen frei wählbaren deutschen Ansagetext lokal mit
-Piper TTS oder spielt eine eigene Audiodatei ab. OwnTone/AirPlay übernimmt die
-synchrone Wiedergabe auf allen oder ausgewählten HomePods. Die Weboberfläche
-verwaltet Hauptschalter, Audioquelle, Zeitplan, Sperrzeit, Lautstärke und
-HomePod-Auswahl.
+It can speak any configured message locally with Piper or play an uploaded
+audio file. OwnTone handles synchronized playback on all or selected HomePods
+and AirPlay speakers. The browser interface controls the announcement source,
+speaker selection, active hours, volume, cooldown, and master switch.
 
-Eigene Ansagen können als MP3, WAV, M4A, AAC, FLAC oder OGG bis 25 MB direkt in
-der Weboberfläche hochgeladen und vorgehört werden.
+**Website:** [postpush.klickwerk.digital](https://postpush.klickwerk.digital/)
 
-## Voraussetzungen
+**Install:** [Runtipi](#install-on-runtipi) · [Docker Compose](#run-with-docker-compose)
 
-- Home Assistant mit funktionierendem Briefkastensensor
-- MQTT-Broker, den Home Assistant und PostPush erreichen können
-- Runtipi-Server und HomePods im selben lokalen Netzwerk/VLAN
-- Apple Home: **Einstellungen des Zuhauses → Lautsprecher & TVs → Jeder im selben Netzwerk**
+## How it works
 
-PostPush verwendet die Ports `8586` für die Weboberfläche und `3690` für die
-eigene OwnTone-Instanz. Damit kann es parallel zur Ring HomePod Doorbell laufen.
+<p align="center">
+  <img src="docs/postpush-flow.svg" alt="Mailbox sensor to Home Assistant, MQTT, PostPush, and HomePods" width="100%">
+</p>
 
-## Installation über Runtipi
+Home Assistant publishes a non-retained MQTT event when the mailbox sensor
+detects mail. PostPush checks its master switch, schedule, and cooldown before
+preparing either local speech or the uploaded sound. OwnTone then sends the
+announcement to the configured AirPlay outputs.
 
-Dieses Repository ist zugleich ein eigener Runtipi App Store. Unter
-**Runtipi → Einstellungen → App Stores** wird folgende Adresse hinzugefügt:
+## Web interface
+
+<p align="center">
+  <img src="docs/screenshots/web-overview.png" alt="PostPush playback and schedule controls" width="100%">
+</p>
+
+The interface provides:
+
+- local Piper text-to-speech with a configurable announcement
+- custom MP3, WAV, M4A, AAC, FLAC, or OGG uploads up to 25 MB
+- individual HomePod and AirPlay speaker selection
+- volume, active hours, and duplicate-event cooldown
+- live MQTT, OwnTone, audio, and last-event status
+- a direct test action without waiting for a real mailbox event
+
+All application settings and audio files remain on the local server.
+
+## Requirements
+
+- Home Assistant with a working mailbox sensor
+- an MQTT broker reachable by Home Assistant and PostPush
+- a Runtipi or Docker host on the same local network/VLAN as the HomePods
+- Apple Home: **Home Settings → Speakers & TV → Anyone On the Same Network**
+
+For the current Runtipi package, Ring HomePod Doorbell must run on the same
+Runtipi host. PostPush deliberately reuses its OwnTone service to avoid two
+conflicting mDNS stacks. The standalone Docker Compose setup includes its own
+OwnTone service and does not require the DoorBell app.
+
+## Install on Runtipi
+
+This repository is also a custom Runtipi app store. In Runtipi, open
+**Settings → App Stores** and add:
 
 ```text
 https://github.com/alexholzreiter/postpush
 ```
 
-Danach erscheint **PostPush** im App Store. Bei der Installation werden
-MQTT-Adresse, Benutzername, Passwort und Topic abgefragt. Empfohlen wird ein
-eigener MQTT-Benutzer `postpush`, der das Topic `postpush/events/mail` lesen darf.
+PostPush then appears in the App Store. During installation, configure the
+MQTT broker URL, username, password, and topic. A dedicated MQTT account named
+`postpush` with read access to `postpush/events/mail` is recommended.
 
-## Home Assistant verbinden
+The Runtipi package uses port `8586` for the web interface and connects to the
+shared OwnTone instance on port `3689`. The app is intentionally not exposable
+through Runtipi and should remain available only on the trusted home network.
 
-Eine zweite Automation veröffentlicht das Ereignis. Die bestehende Handy-Push-
-Automation bleibt unverändert; PostPush verwaltet seinen eigenen Schalter und
-Zeitplan.
+## Connect Home Assistant
+
+Keep any existing phone-push automation unchanged and add a separate MQTT
+automation for PostPush:
 
 ```yaml
-alias: "Briefkasten: PostPush"
+alias: "Mailbox: PostPush"
 triggers:
   - trigger: state
     entity_id: binary_sensor.0xa4c138dd803d5113_occupancy
@@ -60,56 +104,73 @@ actions:
 mode: single
 ```
 
-Alternativ kann die Automation vollständig über die Home-Assistant-Oberfläche
-erstellt werden: Auslöser **Zustand**, Aktion **MQTT: Publish**. Retain muss aus
-bleiben, damit nach einem Neustart keine alte Meldung abgespielt wird.
+Replace the entity ID with the mailbox sensor used in your Home Assistant
+installation. `retain` must remain `false`; otherwise an old mailbox event
+could be replayed after a service restart.
 
-## Lokal entwickeln
-
-```bash
-cp .env.example .env
-npm install
-npm test
-docker compose up -d --build
-```
-
-Danach ist die Weboberfläche unter `http://SERVER-IP:8586` erreichbar.
-Persistente Einstellungen und die erzeugte WAV-Datei liegen in `data/`.
-
-## Eigene Audiodatei
-
-Unter **Ansage → Eigene Datei** kann eine Datei hochgeladen werden. Der Upload
-wird im persistenten Runtipi-Datenverzeichnis gespeichert und automatisch als
-aktive Ansage ausgewählt. Ein späterer Wechsel zurück auf **Text sprechen**
-löscht die Datei nicht, sodass jederzeit zwischen beiden Varianten gewechselt
-werden kann.
-
-## MQTT-Payload
-
-Das konfigurierte Topic akzeptiert nicht-retained Nachrichten mit einem der
-folgenden Inhalte:
+The configured topic accepts any of these non-retained payloads:
 
 ```json
 {"event":"mail"}
 ```
 
-Ebenfalls gültig sind `mail`, `on`, `true`, `1` oder `{"post":true}`.
+Plain `mail`, `on`, `true`, `1`, and `{"post":true}` are accepted as well.
 
-## Datenschutz und Verhalten
+## Run with Docker Compose
 
-- Die Sprachsynthese läuft mit Piper und der deutschen Thorsten-Stimme lokal.
-- Der Ansagetext wird nicht an einen Cloud-TTS-Dienst übertragen.
-- Die Weboberfläche enthält keine externen Schriften, Tracker oder CDNs.
-- Eine AirPlay-Ansage kann laufende Musik kurz unterbrechen.
-- Gespeicherte MQTT-Nachrichten werden absichtlich ignoriert.
+```bash
+cp .env.example .env
+nano .env
+docker compose up -d --build
+docker compose logs -f
+```
 
-## Veröffentlichung
+Open `http://YOUR-SERVER-IP:8586`, choose the announcement, select the
+speakers, and press **Test announcement**.
 
-Der Workflow `.github/workflows/container.yml` baut `amd64`- und `arm64`-Images
-für GHCR, sobald ein Tag wie `v0.1.0` gepusht wird. Das Container-Paket muss
-öffentlich sein, damit Runtipi es ohne Registry-Anmeldung laden kann.
+The standalone stack uses:
 
-## Lizenz
+- port `8586` for the PostPush web interface
+- port `3690` for its dedicated OwnTone instance
+- `data/` for persistent settings, generated speech, uploads, and OwnTone state
 
-MIT. Piper selbst wird unter GPL-3.0 bereitgestellt; das verwendete
-Thorsten-Sprachmodell ist separat lizenziert und wird beim Image-Build geladen.
+## Privacy and behavior
+
+- Piper generates speech locally; announcement text is not sent to cloud TTS.
+- The web application has no external fonts, trackers, analytics, or CDNs.
+- MQTT event messages are processed locally and are not retained by PostPush.
+- An AirPlay announcement can briefly interrupt music already playing.
+- mDNS and the dynamic AirPlay ports must be routed when using separate VLANs.
+
+## Support
+
+PostPush is free and open source. If it makes the mailbox a little smarter and
+you would like to support continued development, you can tip a coffee through
+Stripe:
+
+[![Tip a coffee with Stripe](https://img.shields.io/badge/Tip%20a%20coffee-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://buy.stripe.com/00w8wOcsV8WHdr7apqaZi04)
+
+## Development
+
+```bash
+npm install
+npm test
+docker compose config
+docker build -t postpush:test .
+```
+
+Status endpoints:
+
+- `GET /api/status`
+- `GET /health`
+
+The static, tracking-free project website lives in [`website/`](website/) and
+is automatically deployed to GitHub Pages after changes reach `main`.
+
+## License
+
+PostPush is open-source software licensed under the [MIT License](LICENSE).
+Copyright © 2026 Alexander Holzreiter.
+
+Piper itself is distributed under GPL-3.0. The included Thorsten voice model
+has its own license and is downloaded during the container build.

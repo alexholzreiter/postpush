@@ -1,0 +1,38 @@
+{
+  "name": "PostPush",
+  "serviceType": "self-hosted MQTT-to-AirPlay mailbox announcement bridge",
+  "capabilities": {
+    "audioFormats": {
+      "count": 6,
+      "values": ["MP3", "WAV", "M4A", "AAC", "FLAC", "OGG"]
+    },
+    "announcementModes": {
+      "count": 2,
+      "values": ["local Piper text-to-speech", "uploaded audio file"]
+    },
+    "deploymentMethods": {
+      "count": 2,
+      "values": ["Runtipi", "Docker Compose"]
+    },
+    "eventInputs": ["Home Assistant", "MQTT"],
+    "playbackOutputs": ["HomePod", "HomePod mini", "AirPlay 2 speakers", "compatible Sonos speakers"],
+    "configuration": ["announcement text", "custom audio", "speaker selection", "volume", "active hours", "duplicate-event cooldown"]
+  },
+  "requirements": [
+    "Home Assistant with a mailbox sensor",
+    "MQTT broker reachable by Home Assistant and PostPush",
+    "HomePods or AirPlay speakers reachable from the server",
+    "Apple Home speaker access for devices on the same network",
+    "Runtipi or Docker Compose"
+  ],
+  "limitations": [
+    "May interrupt existing AirPlay playback during an announcement",
+    "Requires mDNS and AirPlay network reachability",
+    "MQTT event messages must not be retained",
+    "Must not be exposed directly to the public internet"
+  ],
+  "install": {
+    "runtipi": "https://github.com/alexholzreiter/postpush#install-on-runtipi",
+    "dockerCompose": "https://github.com/alexholzreiter/postpush#run-locally-with-docker-compose"
+  }
+}

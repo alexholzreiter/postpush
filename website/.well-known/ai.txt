@@ -1,0 +1,13 @@
+# Experimental AI crawler guidance for PostPush
+# This file is informational. robots.txt remains the authoritative crawler policy.
+
+Site: https://postpush.klickwerk.digital/
+Allow: /
+Disallow: none
+Attribution-Name: PostPush
+Attribution-URL: https://postpush.klickwerk.digital/
+Source-Code: https://github.com/alexholzreiter/postpush
+License: MIT
+LLM-Documentation: https://postpush.klickwerk.digital/llms.txt
+Machine-Readable-Summary: https://postpush.klickwerk.digital/ai/summary.json
+Contact: https://postpush.klickwerk.digital/about/

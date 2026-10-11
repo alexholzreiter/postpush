@@ -1,0 +1,20 @@
+{
+  "name": "PostPush",
+  "canonicalUrl": "https://postpush.klickwerk.digital/",
+  "description": "A self-hosted bridge that turns MQTT mailbox events into spoken announcements or custom sounds on selected HomePods.",
+  "category": "self-hosted smart-home automation",
+  "languages": ["en", "de"],
+  "license": "MIT",
+  "sourceCode": "https://github.com/alexholzreiter/postpush",
+  "documentation": "https://github.com/alexholzreiter/postpush#readme",
+  "publisher": {
+    "name": "klickwerk",
+    "url": "https://klickwerk.digital/"
+  },
+  "maintainer": {
+    "name": "Alexander Holzreiter",
+    "url": "https://github.com/alexholzreiter"
+  },
+  "independence": "Independent project; not affiliated with Apple, Home Assistant, Piper, or OwnTone.",
+  "updated": "2026-10-11"
+}

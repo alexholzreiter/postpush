@@ -1,0 +1,32 @@
+# PostPush
+
+> PostPush is an independent, self-hosted bridge that turns Home Assistant mailbox events into spoken announcements or custom sounds on selected HomePods and AirPlay speakers.
+
+The project runs on Runtipi or Docker Compose. It receives non-retained MQTT events, generates optional speech locally with Piper, and uses OwnTone for synchronized AirPlay playback. Event data, audio files, selected outputs, schedules, volume, and cooldown settings remain on the user's server. The project is licensed under the MIT License and is not affiliated with Apple, Home Assistant, Piper, or OwnTone.
+
+## Primary resources
+
+- [Official website](https://postpush.klickwerk.digital/): Features, architecture, privacy principles, and installation choices.
+- [About the project](https://postpush.klickwerk.digital/about/): Project purpose, factual statistics, maintainer, publisher, and contact information.
+- [GitHub repository](https://github.com/alexholzreiter/postpush): Source code, complete README, issues, and release history.
+- [MIT License](https://github.com/alexholzreiter/postpush/blob/main/LICENSE): Terms for using, modifying, and distributing the software.
+
+## Installation
+
+- [Runtipi guide](https://github.com/alexholzreiter/postpush#install-on-runtipi): Add the repository as a custom Runtipi app store and install the app.
+- [Docker Compose guide](https://github.com/alexholzreiter/postpush#run-locally-with-docker-compose): Clone, configure the environment, and start the containers.
+
+## Machine-readable resources
+
+- [Site summary](https://postpush.klickwerk.digital/ai/summary.json): Canonical identity, description, license, languages, and publisher.
+- [FAQ data](https://postpush.klickwerk.digital/ai/faq.json): Structured versions of the visible site FAQs.
+- [Service capabilities](https://postpush.klickwerk.digital/ai/service.json): Supported inputs, outputs, deployment methods, requirements, and limitations.
+- [RSS feed](https://postpush.klickwerk.digital/feed.xml): Project release updates.
+- [Sitemap](https://postpush.klickwerk.digital/sitemap.xml): Indexable public pages.
+
+## Important limitations
+
+- OwnTone may interrupt existing playback while an announcement is active.
+- AirPlay discovery requires mDNS reachability between the server and speakers.
+- MQTT events should not be retained, otherwise an old event could replay after a restart.
+- The web application should remain on a trusted local network and should not be exposed directly to the internet.

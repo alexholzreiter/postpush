@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#171822">
+    <title>About PostPush</title>
+    <meta name="description" content="Learn who builds PostPush, why the project exists, and how its local-first approach protects smart-home data.">
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://postpush.klickwerk.digital/about/">
+    <link rel="alternate" type="application/rss+xml" title="PostPush updates" href="https://postpush.klickwerk.digital/feed.xml">
+    <link rel="icon" href="../assets/logo.png" type="image/png">
+    <link rel="stylesheet" href="../styles.css">
+    <script src="../app.js" type="module"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "AboutPage",
+        "name": "About PostPush",
+        "url": "https://postpush.klickwerk.digital/about/",
+        "isPartOf": { "@id": "https://postpush.klickwerk.digital/#website" },
+        "about": { "@id": "https://postpush.klickwerk.digital/#software" },
+        "publisher": { "@id": "https://postpush.klickwerk.digital/#publisher" },
+        "inLanguage": ["en", "de"]
+      }
+    </script>
+  </head>
+  <body class="about-page">
+    <a class="skip-link" href="#main" data-en="Skip to content" data-de="Zum Inhalt springen">Skip to content</a>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="site-header">
+      <nav class="nav shell" aria-label="Main navigation" data-en-aria="Main navigation" data-de-aria="Hauptnavigation">
+        <a class="brand" href="../" aria-label="PostPush home" data-en-aria="PostPush home" data-de-aria="PostPush Startseite">
+          <span class="brand-mark"><img src="../assets/logo.png" alt=""></span>
+          <span class="brand-copy"><strong>PostPush</strong><small>Mailbox × HomePod</small></span>
+        </a>
+        <button class="menu-button" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu" data-en-aria="Open menu" data-de-aria="Menü öffnen"><span></span><span></span></button>
+        <div id="nav-links" class="nav-links">
+          <a href="../#features" data-en="Features" data-de="Funktionen">Features</a>
+          <a href="../#how-it-works" data-en="How it works" data-de="So funktioniert es">How it works</a>
+          <a href="../#install" data-en="Install" data-de="Installieren">Install</a>
+          <a href="../#faq">FAQ</a>
+          <a href="./" aria-current="page" data-en="About" data-de="Über das Projekt">About</a>
+        </div>
+        <div class="nav-actions">
+          <div class="language-switcher" role="group" aria-label="Choose language" data-en-aria="Choose language" data-de-aria="Sprache auswählen">
+            <button type="button" data-language="en" aria-label="English">EN</button>
+            <button type="button" data-language="de" aria-label="Deutsch">DE</button>
+          </div>
+          <a class="github-button" href="https://github.com/alexholzreiter/postpush" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 4 5 5 0 0 0 19.3.5S18.2.1 15 1.8a13.4 13.4 0 0 0-7 0C4.8.1 3.7.5 3.7.5A5 5 0 0 0 3.6 4a5.4 5.4 0 0 0-1.4 3.7c0 5.3 3.5 6.5 6.8 6.9A4.8 4.8 0 0 0 8 18v4M8 19c-3 .9-3-1.5-4-2"/></svg><span>GitHub</span></a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="about-hero shell reveal">
+        <div>
+          <span class="eyebrow"><i></i><span data-en="ABOUT THE PROJECT" data-de="ÜBER DAS PROJEKT">ABOUT THE PROJECT</span></span>
+          <h1><span data-en="Built to make the mailbox heard." data-de="Entwickelt, damit der Briefkasten gehört wird.">Built to make the mailbox heard.</span></h1>
+          <p data-en="PostPush began with one practical goal: turn a mailbox sensor event into a message that reaches exactly the rooms that should hear it." data-de="PostPush entstand aus einem praktischen Ziel: Ein Briefkasten-Ereignis soll als Ansage genau die Räume erreichen, in denen es gehört werden soll.">PostPush began with one practical goal: turn a mailbox sensor event into a message that reaches exactly the rooms that should hear it.</p>
+        </div>
+        <img src="../assets/logo.png" alt="PostPush logo">
+      </section>
+
+      <section class="about-content shell">
+        <div class="about-story reveal">
+          <span class="section-kicker" data-en="WHY IT EXISTS" data-de="WARUM ES DAS PROJEKT GIBT">WHY IT EXISTS</span>
+          <h2 data-en="A focused bridge, not another cloud." data-de="Eine fokussierte Bridge statt einer weiteren Cloud.">A focused bridge, not another cloud.</h2>
+          <p data-en="The project connects Home Assistant and MQTT with local Piper speech, OwnTone, and AirPlay while keeping event data, audio files, and playback settings on the owner's server. The web interface makes this chain approachable without hiding the realities of a local smart-home system." data-de="Das Projekt verbindet Home Assistant und MQTT mit lokaler Piper-Sprachausgabe, OwnTone und AirPlay. Ereignisdaten, Audiodateien und Wiedergabeeinstellungen bleiben auf dem eigenen Server. Die Oberfläche macht diese Kette zugänglich, ohne die Anforderungen eines lokalen Smart Homes zu verschleiern.">The project connects Home Assistant and MQTT with local Piper speech, OwnTone, and AirPlay while keeping event data, audio files, and playback settings on the owner's server. The web interface makes this chain approachable without hiding the realities of a local smart-home system.</p>
+          <p data-en="Its source code is public under the MIT License. Contributions, bug reports, and technical discussions take place on GitHub." data-de="Der Quellcode ist unter der MIT-Lizenz öffentlich. Beiträge, Fehlermeldungen und technische Diskussionen finden auf GitHub statt.">Its source code is public under the MIT License. Contributions, bug reports, and technical discussions take place on GitHub.</p>
+          <div class="about-actions"><a class="button button-primary" href="https://github.com/alexholzreiter/postpush" target="_blank" rel="noopener noreferrer" data-en="Explore the source" data-de="Quellcode ansehen">Explore the source</a><a class="button button-secondary" href="https://github.com/alexholzreiter/postpush/issues" target="_blank" rel="noopener noreferrer" data-en="Report an issue" data-de="Problem melden">Report an issue</a></div>
+        </div>
+
+        <div class="facts-grid reveal" aria-label="Project facts" data-en-aria="Project facts" data-de-aria="Projektfakten">
+          <article><strong>6</strong><span data-en="supported audio formats" data-de="unterstützte Audioformate">supported audio formats</span></article>
+          <article><strong>2</strong><span data-en="deployment methods" data-de="Installationsmethoden">deployment methods</span></article>
+          <article><strong>2</strong><span data-en="announcement modes" data-de="Ansagearten">announcement modes</span></article>
+          <article><strong>100%</strong><span data-en="self-hosted configuration" data-de="selbst gehostete Konfiguration">self-hosted configuration</span></article>
+        </div>
+      </section>
+
+      <section class="publisher-section shell reveal">
+        <div class="publisher-copy">
+          <span class="section-kicker" data-en="PEOPLE & PUBLISHER" data-de="MENSCHEN & HERAUSGEBER">PEOPLE & PUBLISHER</span>
+          <h2 data-en="Made openly, maintained responsibly." data-de="Offen entwickelt, verantwortungsvoll gepflegt.">Made openly, maintained responsibly.</h2>
+          <p data-en="Created and maintained by Alexander Holzreiter. The project website is published by klickwerk in Lower Austria." data-de="Erstellt und gepflegt von Alexander Holzreiter. Die Projektwebseite wird von klickwerk in Niederösterreich veröffentlicht.">Created and maintained by Alexander Holzreiter. The project website is published by klickwerk in Lower Austria.</p>
+          <p class="independence-note" data-en="PostPush is an independent project and is not affiliated with, endorsed by, or sponsored by Apple, Home Assistant, Piper, or OwnTone." data-de="PostPush ist ein unabhängiges Projekt und steht in keiner Verbindung zu Apple, Home Assistant, Piper oder OwnTone und wird von diesen weder unterstützt noch gesponsert.">PostPush is an independent project and is not affiliated with, endorsed by, or sponsored by Apple, Home Assistant, Piper, or OwnTone.</p>
+        </div>
+        <address class="publisher-card">
+          <strong>klickwerk</strong>
+          <span>Dörfl 30</span>
+          <span>3072 Kasten bei Böheimkirchen, Austria</span>
+          <a href="tel:+4367764314340">+43 677 64314340</a>
+          <a href="mailto:laura@klickwerk.digital">laura@klickwerk.digital</a>
+          <a href="https://klickwerk.digital/kontakt" target="_blank" rel="noopener noreferrer" data-en="Contact klickwerk" data-de="klickwerk kontaktieren">Contact klickwerk</a>
+        </address>
+      </section>
+    </main>
+
+    <footer class="footer shell">
+      <div class="footer-brand"><span class="brand-mark small"><img src="../assets/logo.png" alt=""></span><span><strong>PostPush</strong><small data-en="Independent open-source project" data-de="Unabhängiges Open-Source-Projekt">Independent open-source project</small></span></div>
+      <div class="footer-links"><a href="../" data-en="Home" data-de="Startseite">Home</a><a href="../feed.xml">RSS</a><a href="https://github.com/alexholzreiter/postpush" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://github.com/alexholzreiter/postpush/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" data-en="MIT License" data-de="MIT-Lizenz">MIT License</a><a href="https://buy.stripe.com/00w8wOcsV8WHdr7apqaZi04" target="_blank" rel="noopener noreferrer" data-en="Tip a coffee" data-de="Kaffee spenden">Tip a coffee</a></div>
+      <p>© <span id="year">2026</span> Alexander Holzreiter · <span data-en="Independent project; not affiliated with Apple, Home Assistant, or OwnTone." data-de="Unabhängiges Projekt; nicht mit Apple, Home Assistant oder OwnTone verbunden.">Independent project; not affiliated with Apple, Home Assistant, or OwnTone.</span></p>
+    </footer>
+  </body>
+</html>

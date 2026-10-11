@@ -1,0 +1,26 @@
+{
+  "name": "PostPush FAQs",
+  "canonicalUrl": "https://postpush.klickwerk.digital/#faq",
+  "items": [
+    {
+      "question": "Does it work with HomePod mini?",
+      "answer": "Yes. OwnTone discovers HomePod and HomePod mini models as AirPlay 2 outputs. They must be reachable from the server on the same network or through correctly routed mDNS."
+    },
+    {
+      "question": "Can I choose individual speakers?",
+      "answer": "Yes. Select any combination of discovered AirPlay speakers or automatically include every available output. Volume is configurable as well."
+    },
+    {
+      "question": "Can it speak my own text?",
+      "answer": "Yes. PostPush generates the configured announcement locally with Piper, or it can play an uploaded MP3, WAV, M4A, AAC, FLAC, or OGG file."
+    },
+    {
+      "question": "How does Home Assistant trigger PostPush?",
+      "answer": "A Home Assistant automation publishes a non-retained message to the configured MQTT topic when the mailbox sensor detects mail."
+    },
+    {
+      "question": "Does the announcement leave my network?",
+      "answer": "No. Piper creates speech locally, settings stay on the server, and OwnTone sends audio directly to speakers on the home network."
+    }
+  ]
+}

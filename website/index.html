@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#171822">
+    <meta name="color-scheme" content="light">
+    <title>PostPush — Mailbox announcements on HomePods</title>
+    <meta name="author" content="Alexander Holzreiter">
+    <meta name="description" content="Turn a mailbox sensor event into a spoken message or custom sound on selected HomePods. Open-source, self-hosted, and local-first.">
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://postpush.klickwerk.digital/">
+    <link rel="alternate" type="application/rss+xml" title="PostPush updates" href="https://postpush.klickwerk.digital/feed.xml">
+    <link rel="icon" href="assets/logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="PostPush">
+    <meta property="og:title" content="PostPush — Mailbox announcements on HomePods">
+    <meta property="og:description" content="A self-hosted MQTT-to-AirPlay bridge for spoken mailbox alerts and custom sounds.">
+    <meta property="og:url" content="https://postpush.klickwerk.digital/">
+    <meta property="og:image" content="https://postpush.klickwerk.digital/assets/app-overview.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PostPush — Mailbox announcements on HomePods">
+    <meta name="twitter:description" content="New mail. Your announcement. Every room.">
+    <meta name="twitter:image" content="https://postpush.klickwerk.digital/assets/app-overview.png">
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" type="module"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://postpush.klickwerk.digital/#publisher",
+            "name": "klickwerk",
+            "url": "https://klickwerk.digital/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://klickwerk.digital/hubfs/klickwerk_icon-2.png"
+            },
+            "email": "laura@klickwerk.digital",
+            "telephone": "+43 677 64314340",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Dörfl 30",
+              "postalCode": "3072",
+              "addressLocality": "Kasten bei Böheimkirchen",
+              "addressCountry": "AT"
+            },
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "contactType": "customer support",
+              "email": "laura@klickwerk.digital",
+              "telephone": "+43 677 64314340",
+              "availableLanguage": ["German", "English"],
+              "url": "https://klickwerk.digital/kontakt"
+            }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://postpush.klickwerk.digital/#author",
+            "name": "Alexander Holzreiter",
+            "url": "https://github.com/alexholzreiter"
+          },
+          {
+            "@type": "Brand",
+            "@id": "https://postpush.klickwerk.digital/#brand",
+            "name": "PostPush",
+            "url": "https://postpush.klickwerk.digital/",
+            "logo": "https://postpush.klickwerk.digital/assets/logo.png"
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://postpush.klickwerk.digital/#website",
+            "name": "PostPush",
+            "url": "https://postpush.klickwerk.digital/",
+            "description": "The official website for the self-hosted MQTT-to-AirPlay mailbox announcement bridge.",
+            "inLanguage": ["en", "de"],
+            "publisher": { "@id": "https://postpush.klickwerk.digital/#publisher" }
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://postpush.klickwerk.digital/#software",
+            "name": "PostPush",
+            "brand": { "@id": "https://postpush.klickwerk.digital/#brand" },
+            "isPartOf": { "@id": "https://postpush.klickwerk.digital/#website" },
+            "author": { "@id": "https://postpush.klickwerk.digital/#author" },
+            "publisher": { "@id": "https://postpush.klickwerk.digital/#publisher" },
+            "applicationCategory": "UtilitiesApplication",
+            "operatingSystem": "Docker, Runtipi",
+            "softwareVersion": "0.2.9",
+            "url": "https://postpush.klickwerk.digital/",
+            "downloadUrl": "https://github.com/alexholzreiter/postpush",
+            "sameAs": "https://github.com/alexholzreiter/postpush",
+            "isAccessibleForFree": true,
+            "license": "https://opensource.org/license/mit",
+            "screenshot": [
+              "https://postpush.klickwerk.digital/assets/app-overview.png",
+              "https://postpush.klickwerk.digital/assets/app-setup.png"
+            ],
+            "featureList": [
+              "Local Piper text-to-speech and custom audio in six formats",
+              "Synchronized playback on selected AirPlay 2 speakers",
+              "Schedule, cooldown, speaker selection, and volume controls",
+              "MQTT integration for Home Assistant mailbox sensors",
+              "Runtipi and Docker Compose deployment",
+              "Local-first operation without cloud text-to-speech"
+            ],
+            "description": "A self-hosted bridge that turns MQTT mailbox events into spoken announcements or custom sounds on selected HomePods."
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://postpush.klickwerk.digital/#faq-schema",
+            "isPartOf": { "@id": "https://postpush.klickwerk.digital/#website" },
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Does it work with HomePod mini?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Yes. OwnTone discovers HomePod and HomePod mini models as AirPlay 2 outputs. They must be reachable from the server on the same network or through correctly routed mDNS." }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I choose individual speakers?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Yes. Select any combination of discovered AirPlay speakers or automatically include every available output. Volume is configurable as well." }
+              },
+              {
+                "@type": "Question",
+                "name": "Can it speak my own text?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Yes. PostPush generates the configured announcement locally with Piper, or it can play an uploaded MP3, WAV, M4A, AAC, FLAC, or OGG file." }
+              },
+              {
+                "@type": "Question",
+                "name": "How does Home Assistant trigger PostPush?",
+                "acceptedAnswer": { "@type": "Answer", "text": "A Home Assistant automation publishes a non-retained message to the configured MQTT topic when the mailbox sensor detects mail." }
+              },
+              {
+                "@type": "Question",
+                "name": "Does the announcement leave my network?",
+                "acceptedAnswer": { "@type": "Answer", "text": "No. Piper creates speech locally, settings stay on the server, and OwnTone sends audio directly to speakers on the home network." }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main" data-en="Skip to content" data-de="Zum Inhalt springen">Skip to content</a>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="site-header">
+      <nav class="nav shell" aria-label="Main navigation" data-en-aria="Main navigation" data-de-aria="Hauptnavigation">
+        <a class="brand" href="#top" aria-label="PostPush home" data-en-aria="PostPush home" data-de-aria="PostPush Startseite">
+          <span class="brand-mark"><img src="assets/logo.png" alt=""></span>
+          <span class="brand-copy"><strong>PostPush</strong><small>Mailbox × HomePod</small></span>
+        </a>
+
+        <button class="menu-button" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu" data-en-aria="Open menu" data-de-aria="Menü öffnen">
+          <span></span><span></span>
+        </button>
+
+        <div id="nav-links" class="nav-links">
+          <a href="#features" data-en="Features" data-de="Funktionen">Features</a>
+          <a href="#how-it-works" data-en="How it works" data-de="So funktioniert es">How it works</a>
+          <a href="#install" data-en="Install" data-de="Installieren">Install</a>
+          <a href="#faq">FAQ</a>
+          <a href="about/" data-en="About" data-de="Über das Projekt">About</a>
+        </div>
+
+        <div class="nav-actions">
+          <div class="language-switcher" role="group" aria-label="Choose language" data-en-aria="Choose language" data-de-aria="Sprache auswählen">
+            <button type="button" data-language="en" aria-label="English">EN</button>
+            <button type="button" data-language="de" aria-label="Deutsch">DE</button>
+          </div>
+          <a class="github-button" href="https://github.com/alexholzreiter/postpush" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 4 5 5 0 0 0 19.3.5S18.2.1 15 1.8a13.4 13.4 0 0 0-7 0C4.8.1 3.7.5 3.7.5A5 5 0 0 0 3.6 4a5.4 5.4 0 0 0-1.4 3.7c0 5.3 3.5 6.5 6.8 6.9A4.8 4.8 0 0 0 8 18v4M8 19c-3 .9-3-1.5-4-2"/></svg>
+            <span>GitHub</span>
+          </a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section id="top" class="hero shell">
+        <div class="hero-copy reveal">
+          <span class="eyebrow"><i></i><span data-en="Open source · Self-hosted · Local-first" data-de="Open Source · Selbst gehostet · Lokal">Open source · Self-hosted · Local-first</span></span>
+          <h1><span>PostPush.</span><br><em data-en="New mail." data-de="Neue Post.">New mail.</em><br><span data-en="Every room." data-de="In jedem Raum.">Every room.</span></h1>
+          <p data-en="Turn a mailbox sensor event into a spoken message or custom sound on selected HomePods and AirPlay speakers — synchronized, configurable, and entirely under your control." data-de="Verwandle ein Briefkasten-Ereignis in eine gesprochene Nachricht oder einen eigenen Sound auf ausgewählten HomePods und AirPlay-Lautsprechern – synchron, konfigurierbar und vollständig unter deiner Kontrolle.">Turn a mailbox sensor event into a spoken message or custom sound on selected HomePods and AirPlay speakers — synchronized, configurable, and entirely under your control.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="https://github.com/alexholzreiter/postpush" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 4 5 5 0 0 0 19.3.5S18.2.1 15 1.8a13.4 13.4 0 0 0-7 0C4.8.1 3.7.5 3.7.5A5 5 0 0 0 3.6 4a5.4 5.4 0 0 0-1.4 3.7c0 5.3 3.5 6.5 6.8 6.9A4.8 4.8 0 0 0 8 18v4M8 19c-3 .9-3-1.5-4-2"/></svg>
+              <span data-en="View on GitHub" data-de="Auf GitHub ansehen">View on GitHub</span>
+            </a>
+            <a class="button button-secondary" href="#install">
+              <span data-en="Choose an install method" data-de="Installation wählen">Choose an install method</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </a>
+          </div>
+          <div class="hero-meta">
+            <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-en="No cloud account" data-de="Kein Cloud-Konto">No cloud account</span></span>
+            <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-en="No tracking" data-de="Kein Tracking">No tracking</span></span>
+            <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span data-en="Docker ready" data-de="Docker-bereit">Docker ready</span></span>
+          </div>
+        </div>
+
+        <div class="hero-visual reveal" aria-label="PostPush interface preview" data-en-aria="PostPush interface preview" data-de-aria="Vorschau der PostPush Oberfläche">
+          <div class="glow"></div>
+          <div class="browser-frame">
+            <div class="browser-bar"><span></span><span></span><span></span><small>postpush.local</small></div>
+            <img src="assets/app-overview.png" alt="PostPush web interface" data-en-alt="PostPush web interface" data-de-alt="Weboberfläche von PostPush">
+          </div>
+          <div class="event-card event-ring">
+            <span class="event-icon orange"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4z"/><path d="m5 7 7 6 7-6"/></svg></span>
+            <span><small>MQTT EVENT</small><strong data-en="Mail detected" data-de="Post erkannt">Mail detected</strong></span>
+          </div>
+          <div class="event-card event-output">
+            <span class="event-icon purple"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l10-2v13M9 9l10-2M6 18a3 2 0 1 0 0 .1M16 16a3 2 0 1 0 0 .1"/></svg></span>
+            <span><small>AIRPLAY</small><strong data-en="Playing on 5 speakers" data-de="Wiedergabe auf 5 Geräten">Playing on 5 speakers</strong></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="trust-strip shell" aria-label="Product highlights" data-en-aria="Product highlights" data-de-aria="Produktvorteile">
+        <span><strong>100%</strong><small data-en="self-hosted" data-de="selbst gehostet">self-hosted</small></span>
+        <i></i>
+        <span><strong>AirPlay 2</strong><small data-en="multi-room audio" data-de="Multiroom-Audio">multi-room audio</small></span>
+        <i></i>
+        <span><strong>Runtipi + Docker</strong><small data-en="ready to deploy" data-de="direkt installierbar">ready to deploy</small></span>
+        <i></i>
+        <span><strong>Piper TTS</strong><small data-en="local voice synthesis" data-de="lokale Sprachausgabe">local voice synthesis</small></span>
+      </section>
+
+      <section id="features" class="section shell">
+        <div class="section-heading reveal">
+          <div><span class="section-kicker" data-en="BUILT FOR YOUR HOME" data-de="FÜR DEIN ZUHAUSE">BUILT FOR YOUR HOME</span><h2 data-en="A smarter way to hear the mailbox." data-de="Die smartere Art, den Briefkasten zu hören.">A smarter way to hear the mailbox.</h2></div>
+          <p data-en="Everything needed for a personal, reliable mailbox announcement — without sending text, audio, or settings to another service." data-de="Alles für eine persönliche und zuverlässige Briefkasten-Ansage – ohne Text, Audio oder Einstellungen an einen weiteren Dienst zu senden.">Everything needed for a personal, reliable mailbox announcement — without sending text, audio, or settings to another service.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card feature-main reveal">
+            <span class="feature-icon orange"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l10-2v13M9 9l10-2M6 18a3 2 0 1 0 0 .1M16 16a3 2 0 1 0 0 .1"/></svg></span>
+            <span class="feature-number">01</span>
+            <h3 data-en="Say it your way." data-de="Sag es auf deine Art.">Say it your way.</h3>
+            <p data-en="Type any announcement for local Piper speech, or upload MP3, WAV, M4A, AAC, FLAC, or OGG." data-de="Nutze einen beliebigen Text für lokale Piper-Sprachausgabe oder lade MP3, WAV, M4A, AAC, FLAC oder OGG hoch.">Type any announcement for local Piper speech, or upload MP3, WAV, M4A, AAC, FLAC, or OGG.</p>
+            <div class="waveform" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-icon purple"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5a7 7 0 0 1 14 0v7a3.5 3.5 0 0 1-7 0v-7M8.5 15.5a3.5 3.5 0 0 0 7 0"/></svg></span>
+            <span class="feature-number">02</span>
+            <h3 data-en="Every room, in sync." data-de="Jeder Raum, synchron.">Every room, in sync.</h3>
+            <p data-en="Choose individual HomePods, AirPlay speakers, and compatible Sonos devices — or include every new speaker automatically." data-de="Wähle einzelne HomePods, AirPlay-Lautsprecher und kompatible Sonos-Geräte – oder füge neue Geräte automatisch hinzu.">Choose individual HomePods, AirPlay speakers, and compatible Sonos devices — or include every new speaker automatically.</p>
+          </article>
+          <article class="feature-card reveal">
+            <span class="feature-icon blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg></span>
+            <span class="feature-number">03</span>
+            <h3 data-en="Fine-tuned for real life." data-de="Fein abgestimmt für den Alltag.">Fine-tuned for real life.</h3>
+            <p data-en="Set the volume, active hours, and cooldown, then test the complete flow directly from the browser." data-de="Stelle Lautstärke, aktive Zeiten und Sperrzeit ein und teste anschließend den gesamten Ablauf direkt im Browser.">Set the volume, active hours, and cooldown, then test the complete flow directly from the browser.</p>
+          </article>
+          <article class="feature-card feature-dark reveal">
+            <span class="feature-icon green"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 2.8 8.5 7 10 4.2-1.5 7-5.5 7-10V6l-7-3Z"/><path d="m9.5 12 1.7 1.7 3.6-4"/></svg></span>
+            <span class="feature-number">04</span>
+            <h3 data-en="Local by design." data-de="Von Grund auf lokal.">Local by design.</h3>
+            <p data-en="Speech, audio, and configuration stay on your server. The project website uses no analytics, cookies, or trackers either." data-de="Sprache, Audio und Konfiguration bleiben auf deinem Server. Auch diese Projektwebseite verwendet keine Analysen, Cookies oder Tracker.">Speech, audio, and configuration stay on your server. The project website uses no analytics, cookies, or trackers either.</p>
+            <span class="local-chip"><i></i><span data-en="Running at home" data-de="Läuft bei dir zuhause">Running at home</span></span>
+          </article>
+        </div>
+      </section>
+
+      <section id="how-it-works" class="section process-section">
+        <div class="shell">
+          <div class="section-heading centered reveal">
+            <div><span class="section-kicker" data-en="ONE EVENT. THREE STEPS." data-de="EIN EREIGNIS. DREI SCHRITTE.">ONE EVENT. THREE STEPS.</span><h2 data-en="From the mailbox to every room." data-de="Vom Briefkasten in jeden Raum.">From the mailbox to every room.</h2></div>
+            <p data-en="PostPush connects the services already running at home and keeps the complete flow inside the local network." data-de="PostPush verbindet die bereits vorhandenen Dienste und hält den gesamten Ablauf im lokalen Netzwerk.">PostPush connects the services already running at home and keeps the complete flow inside the local network.</p>
+          </div>
+          <div class="process-grid">
+            <article class="process-card reveal"><span class="process-index">01</span><div class="process-visual ring-visual"><span class="mailbox-device"><i></i></span></div><h3 data-en="The sensor detects mail" data-de="Der Sensor erkennt Post">The sensor detects mail</h3><p data-en="Home Assistant publishes a non-retained event to the configured MQTT topic." data-de="Home Assistant veröffentlicht ein nicht gespeichertes Ereignis im konfigurierten MQTT-Topic.">Home Assistant publishes a non-retained event to the configured MQTT topic.</p></article>
+            <span class="process-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+            <article class="process-card reveal"><span class="process-index">02</span><div class="process-visual bridge-visual"><img src="assets/logo.png" alt=""><span></span><span></span></div><h3 data-en="PostPush prepares the message" data-de="PostPush bereitet die Ansage vor">PostPush prepares the message</h3><p data-en="It checks the schedule and cooldown, then uses local speech or the uploaded audio file." data-de="PostPush prüft Zeitplan und Sperrzeit und nutzt dann lokale Sprache oder die hochgeladene Audiodatei.">It checks the schedule and cooldown, then uses local speech or the uploaded audio file.</p></article>
+            <span class="process-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+            <article class="process-card reveal"><span class="process-index">03</span><div class="process-visual pods-visual"><i></i><i></i><i></i></div><h3 data-en="OwnTone plays in sync" data-de="OwnTone spielt synchron ab">OwnTone plays in sync</h3><p data-en="The announcement plays across the selected AirPlay speakers at the configured volume." data-de="Die Ansage wird mit der eingestellten Lautstärke auf den ausgewählten AirPlay-Geräten abgespielt.">The announcement plays across the selected AirPlay speakers at the configured volume.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section showcase shell">
+        <div class="showcase-copy reveal">
+          <span class="section-kicker" data-en="SIMPLE ON THE SURFACE" data-de="EINFACH ZU BEDIENEN">SIMPLE ON THE SURFACE</span>
+          <h2 data-en="Everything in one calm, clear dashboard." data-de="Alles in einem ruhigen, übersichtlichen Dashboard.">Everything in one calm, clear dashboard.</h2>
+          <p data-en="See MQTT, AirPlay, and audio health at a glance, choose exactly where the message should play, and review the latest mailbox event." data-de="Sieh MQTT-, AirPlay- und Audio-Status auf einen Blick, wähle die Wiedergabegeräte und prüfe das letzte Briefkasten-Ereignis.">See MQTT, AirPlay, and audio health at a glance, choose exactly where the message should play, and review the latest mailbox event.</p>
+          <ul>
+            <li><span><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span data-en="Live MQTT, AirPlay, and audio status" data-de="Live-Status für MQTT, AirPlay und Audio">Live MQTT, AirPlay, and audio status</span></li>
+            <li><span><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span data-en="Speaker selection, volume, and cooldown" data-de="Lautsprecherauswahl, Lautstärke und Sperrzeit">Speaker selection, volume, and cooldown</span></li>
+            <li><span><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span data-en="Text-to-speech, uploads, and active hours" data-de="Sprachausgabe, Uploads und aktive Zeiten">Text-to-speech, uploads, and active hours</span></li>
+          </ul>
+          <a class="text-link" href="https://github.com/alexholzreiter/postpush#readme" target="_blank" rel="noopener noreferrer"><span data-en="Explore the documentation" data-de="Dokumentation ansehen">Explore the documentation</span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+        <div class="showcase-visual reveal"><div class="browser-frame light"><div class="browser-bar"><span></span><span></span><span></span><small>PostPush</small></div><img src="assets/app-setup.png" alt="Speaker selection and live status in PostPush" data-en-alt="Speaker selection and live status in PostPush" data-de-alt="Lautsprecherauswahl und Live-Status in PostPush"></div></div>
+      </section>
+
+      <section id="install" class="section install-section shell">
+        <div class="install-panel reveal">
+          <div class="install-intro">
+            <span class="section-kicker" data-en="READY WHEN YOU ARE" data-de="BEREIT, WENN DU ES BIST">READY WHEN YOU ARE</span>
+            <h2 data-en="Choose an installation path." data-de="Wähle deine Installation.">Choose an installation path.</h2>
+            <p data-en="Use the guided Runtipi experience or run the same container with Docker Compose. Both keep everything on your server." data-de="Nutze die geführte Installation in Runtipi oder starte denselben Container mit Docker Compose. Beides bleibt auf deinem Server.">Use the guided Runtipi experience or run the same container with Docker Compose. Both keep everything on your server.</p>
+            <div class="requirements"><span data-en="Before you start" data-de="Bevor du startest">Before you start</span><ul><li data-en="Home Assistant with a mailbox sensor" data-de="Home Assistant mit Briefkastensensor">Home Assistant with a mailbox sensor</li><li data-en="An MQTT broker reachable by both services" data-de="Ein für beide Dienste erreichbarer MQTT-Broker">An MQTT broker reachable by both services</li><li data-en="HomePods and server on the same network" data-de="HomePods und Server im selben Netzwerk">HomePods and server on the same network</li><li data-en="DoorBell app on the same host for Runtipi installs" data-de="DoorBell-App auf demselben Host bei Runtipi-Installationen">DoorBell app on the same host for Runtipi installs</li></ul></div>
+          </div>
+          <div class="install-box">
+            <div class="install-tabs" role="tablist" aria-label="Installation method" data-en-aria="Installation method" data-de-aria="Installationsmethode">
+              <button id="runtipi-tab" type="button" role="tab" aria-selected="true" aria-controls="runtipi-panel" data-install-tab="runtipi">Runtipi</button>
+              <button id="docker-tab" type="button" role="tab" aria-selected="false" aria-controls="docker-panel" data-install-tab="docker">Docker Compose</button>
+            </div>
+            <div id="runtipi-panel" class="install-content active" role="tabpanel" aria-labelledby="runtipi-tab" data-install-panel="runtipi">
+              <span class="install-badge" data-en="Recommended for the easiest setup" data-de="Empfohlen für die einfachste Einrichtung">Recommended for the easiest setup</span>
+              <ol><li data-en="Install Ring HomePod Doorbell for its shared OwnTone service." data-de="Installiere Ring HomePod Doorbell für den gemeinsam genutzten OwnTone-Dienst.">Install Ring HomePod Doorbell for its shared OwnTone service.</li><li data-en="Open Settings → App Stores in Runtipi." data-de="Öffne Einstellungen → App Stores in Runtipi.">Open Settings → App Stores in Runtipi.</li><li data-en="Add the repository below as a custom app store." data-de="Füge das Repository als persönlichen App Store hinzu.">Add the repository below as a custom app store.</li><li data-en="Install PostPush and configure MQTT." data-de="Installiere PostPush und konfiguriere MQTT.">Install PostPush and configure MQTT.</li></ol>
+              <div class="code-block"><code>https://github.com/alexholzreiter/postpush</code><button class="copy-button" type="button" data-copy="https://github.com/alexholzreiter/postpush" data-en-label="Copy" data-de-label="Kopieren"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-en="Copy" data-de="Kopieren">Copy</span></button></div>
+              <a class="button button-primary wide" href="https://github.com/alexholzreiter/postpush#install-on-runtipi" target="_blank" rel="noopener noreferrer"><span data-en="Open Runtipi guide" data-de="Runtipi-Anleitung öffnen">Open Runtipi guide</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+            </div>
+            <div id="docker-panel" class="install-content" role="tabpanel" aria-labelledby="docker-tab" data-install-panel="docker" hidden>
+              <span class="install-badge" data-en="For any Docker host" data-de="Für jeden Docker-Server">For any Docker host</span>
+              <ol><li data-en="Clone the repository onto your server." data-de="Klone das Repository auf deinen Server.">Clone the repository onto your server.</li><li data-en="Create and configure your .env file." data-de="Erstelle und konfiguriere deine .env-Datei.">Create and configure your .env file.</li><li data-en="Start the stack with Docker Compose." data-de="Starte den Stack mit Docker Compose.">Start the stack with Docker Compose.</li></ol>
+              <div class="code-block multiline"><code>git clone https://github.com/alexholzreiter/postpush.git<br>cd postpush<br>cp .env.example .env<br>docker compose up -d</code><button class="copy-button" type="button" data-copy="git clone https://github.com/alexholzreiter/postpush.git%0Acd postpush%0Acp .env.example .env%0Adocker compose up -d" data-en-label="Copy" data-de-label="Kopieren"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span data-en="Copy" data-de="Kopieren">Copy</span></button></div>
+              <a class="button button-primary wide" href="https://github.com/alexholzreiter/postpush#run-locally-with-docker-compose" target="_blank" rel="noopener noreferrer"><span data-en="Open Docker guide" data-de="Docker-Anleitung öffnen">Open Docker guide</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section privacy-section shell reveal">
+        <div class="privacy-visual"><span class="shield"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 2.8 8.5 7 10 4.2-1.5 7-5.5 7-10V6l-7-3Z"/><path d="m9.5 12 1.7 1.7 3.6-4"/></svg></span><i></i><i></i><i></i></div>
+        <div><span class="section-kicker" data-en="LOCAL-FIRST, FOR REAL" data-de="ECHT LOCAL-FIRST">LOCAL-FIRST, FOR REAL</span><h2 data-en="Smart-home data stays at home." data-de="Deine Smart-Home-Daten bleiben zuhause.">Smart-home data stays at home.</h2><p data-en="PostPush runs on hardware you control. Piper creates speech locally, and MQTT events, audio files, and settings never pass through our servers." data-de="PostPush läuft auf deiner eigenen Hardware. Piper erzeugt Sprache lokal; MQTT-Ereignisse, Audiodateien und Einstellungen passieren niemals unsere Server.">PostPush runs on hardware you control. Piper creates speech locally, and MQTT events, audio files, and settings never pass through our servers.</p><div class="privacy-points"><span><i></i><span data-en="No cloud TTS" data-de="Keine Cloud-Sprachausgabe">No cloud TTS</span></span><span><i></i><span data-en="No analytics" data-de="Keine Analyse">No analytics</span></span><span><i></i><span data-en="No advertising" data-de="Keine Werbung">No advertising</span></span></div></div>
+      </section>
+
+      <section id="faq" class="section faq-section shell">
+        <div class="section-heading reveal"><div><span class="section-kicker" data-en="GOOD TO KNOW" data-de="GUT ZU WISSEN">GOOD TO KNOW</span><h2 data-en="Questions, answered." data-de="Fragen, beantwortet.">Questions, answered.</h2></div><p data-en="The practical details before mailbox announcements arrive in every room." data-de="Die wichtigsten Details, bevor Briefkasten-Ansagen in jedem Raum ankommen.">The practical details before mailbox announcements arrive in every room.</p></div>
+        <div class="faq-list reveal">
+          <details><summary><span data-en="Does it work with HomePod mini?" data-de="Funktioniert es mit dem HomePod mini?">Does it work with HomePod mini?</span><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary><p data-en="Yes. OwnTone discovers HomePod and HomePod mini models as AirPlay 2 outputs. They must be reachable from the server on the same network or through correctly routed mDNS." data-de="Ja. OwnTone erkennt HomePod und HomePod mini als AirPlay-2-Ausgänge. Sie müssen vom Server im selben Netzwerk oder über korrekt geroutetes mDNS erreichbar sein.">Yes. OwnTone discovers HomePod and HomePod mini models as AirPlay 2 outputs. They must be reachable from the server on the same network or through correctly routed mDNS.</p></details>
+          <details><summary><span data-en="Can I choose individual speakers?" data-de="Kann ich einzelne Lautsprecher auswählen?">Can I choose individual speakers?</span><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary><p data-en="Yes. Select any combination of discovered AirPlay speakers or automatically include every available output. Volume is configurable as well." data-de="Ja. Wähle eine beliebige Kombination erkannter AirPlay-Lautsprecher oder beziehe automatisch alle verfügbaren Ausgänge ein. Auch die Lautstärke ist einstellbar.">Yes. Select any combination of discovered AirPlay speakers or automatically include every available output. Volume is configurable as well.</p></details>
+          <details><summary><span data-en="Can it speak my own text?" data-de="Kann PostPush meinen eigenen Text sprechen?">Can it speak my own text?</span><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary><p data-en="Yes. PostPush generates the configured announcement locally with Piper, or it can play an uploaded MP3, WAV, M4A, AAC, FLAC, or OGG file." data-de="Ja. PostPush erzeugt die eingestellte Ansage lokal mit Piper oder spielt eine hochgeladene MP3-, WAV-, M4A-, AAC-, FLAC- oder OGG-Datei ab.">Yes. PostPush generates the configured announcement locally with Piper, or it can play an uploaded MP3, WAV, M4A, AAC, FLAC, or OGG file.</p></details>
+          <details><summary><span data-en="How does Home Assistant trigger PostPush?" data-de="Wie löst Home Assistant PostPush aus?">How does Home Assistant trigger PostPush?</span><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary><p data-en="A Home Assistant automation publishes a non-retained message to the configured MQTT topic when the mailbox sensor detects mail." data-de="Eine Home-Assistant-Automation veröffentlicht eine nicht gespeicherte Nachricht im konfigurierten MQTT-Topic, sobald der Briefkastensensor Post erkennt.">A Home Assistant automation publishes a non-retained message to the configured MQTT topic when the mailbox sensor detects mail.</p></details>
+          <details><summary><span data-en="Does the announcement leave my network?" data-de="Verlässt die Ansage mein Netzwerk?">Does the announcement leave my network?</span><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary><p data-en="No. Piper creates speech locally, settings stay on the server, and OwnTone sends audio directly to speakers on the home network." data-de="Nein. Piper erzeugt Sprache lokal, Einstellungen bleiben auf dem Server und OwnTone sendet Audio direkt an die Lautsprecher im Heimnetz.">No. Piper creates speech locally, settings stay on the server, and OwnTone sends audio directly to speakers on the home network.</p></details>
+        </div>
+      </section>
+
+      <section class="final-cta shell reveal">
+        <div class="cta-orbit one"></div><div class="cta-orbit two"></div>
+        <img src="assets/logo.png" alt="" class="cta-logo">
+        <span class="section-kicker" data-en="LET THE MAILBOX SPEAK" data-de="LASS DEN BRIEFKASTEN SPRECHEN">LET THE MAILBOX SPEAK</span>
+        <h2 data-en="Hear about new mail in every room." data-de="Höre in jedem Raum, wenn neue Post da ist.">Hear about new mail in every room.</h2>
+        <p data-en="Free, open source, and ready for your Runtipi or Docker server." data-de="Kostenlos, Open Source und bereit für deinen Runtipi- oder Docker-Server.">Free, open source, and ready for your Runtipi or Docker server.</p>
+        <div class="hero-actions centered-actions"><a class="button button-primary" href="https://github.com/alexholzreiter/postpush" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3.3-.4 6.8-1.6 6.8-7A5.4 5.4 0 0 0 19.4 4 5 5 0 0 0 19.3.5S18.2.1 15 1.8a13.4 13.4 0 0 0-7 0C4.8.1 3.7.5 3.7.5A5 5 0 0 0 3.6 4a5.4 5.4 0 0 0-1.4 3.7c0 5.3 3.5 6.5 6.8 6.9A4.8 4.8 0 0 0 8 18v4M8 19c-3 .9-3-1.5-4-2"/></svg><span data-en="Get it on GitHub" data-de="Jetzt auf GitHub">Get it on GitHub</span></a><a class="button button-secondary light-button" href="#install"><span data-en="Installation options" data-de="Installationsoptionen">Installation options</span></a><a class="button coffee-button" href="https://buy.stripe.com/00w8wOcsV8WHdr7apqaZi04" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13v7a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8Z"/><path d="M17 10h2a3 3 0 0 1 0 6h-2M7 4v1M11 3v2M15 4v1"/></svg><span data-en="Tip a coffee" data-de="Kaffee spenden">Tip a coffee</span></a></div>
+      </section>
+    </main>
+
+    <footer class="footer shell">
+      <div class="footer-brand"><span class="brand-mark small"><img src="assets/logo.png" alt=""></span><span><strong>PostPush</strong><small data-en="Independent open-source project" data-de="Unabhängiges Open-Source-Projekt">Independent open-source project</small></span></div>
+      <div class="footer-links"><a href="about/" data-en="About" data-de="Über das Projekt">About</a><a href="feed.xml">RSS</a><a href="https://github.com/alexholzreiter/postpush" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://github.com/alexholzreiter/postpush/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" data-en="MIT License" data-de="MIT-Lizenz">MIT License</a><a href="https://github.com/alexholzreiter/postpush/issues" target="_blank" rel="noopener noreferrer" data-en="Issues" data-de="Probleme melden">Issues</a><a href="https://buy.stripe.com/00w8wOcsV8WHdr7apqaZi04" target="_blank" rel="noopener noreferrer" data-en="Tip a coffee" data-de="Auf einen Kaffee">Tip a coffee</a></div>
+      <p>© <span id="year">2026</span> Alexander Holzreiter · <span data-en="Independent project; not affiliated with Apple, Home Assistant, or OwnTone." data-de="Unabhängiges Projekt; nicht mit Apple, Home Assistant oder OwnTone verbunden.">Independent project; not affiliated with Apple, Home Assistant, or OwnTone.</span></p>
+    </footer>
+  </body>
+</html>
