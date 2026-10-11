@@ -79,10 +79,18 @@ export class OwnToneClient {
     });
   }
 
+  async setOutputVolume(outputId, volume) {
+    const query = new URLSearchParams({
+      output_id: String(outputId),
+      volume: String(volume),
+    });
+    await this.request(`/api/player/volume?${query}`, { method: "PUT" });
+  }
+
   async prepareOutputs(outputIds, volume) {
     await this.setOutputs(outputIds);
     for (const id of outputIds) {
-      await this.configureOutput(id, { selected: true, volume });
+      await this.setOutputVolume(id, volume);
     }
   }
 
