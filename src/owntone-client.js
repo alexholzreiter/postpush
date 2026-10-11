@@ -49,6 +49,10 @@ export class OwnToneClient {
     throw lastError;
   }
 
+  async getPlayer() {
+    return this.request("/api/player");
+  }
+
   async rescan() {
     await this.request("/api/update", { method: "PUT" });
   }
@@ -89,9 +93,33 @@ export class OwnToneClient {
 
   async prepareOutputs(outputIds, volume) {
     await this.setOutputs(outputIds);
+
+    // OwnTone's bulk endpoint may still answer with 204 when an AirPlay
+    // connection was not activated. Selecting every requested output once
+    // more through the per-output endpoint makes that failure observable.
+    for (const id of outputIds) {
+      await this.configureOutput(id, { selected: true });
+    }
+
+    await this.waitForSelectedOutputs(outputIds);
     for (const id of outputIds) {
       await this.setOutputVolume(id, volume);
     }
+  }
+
+  async waitForSelectedOutputs(outputIds, attempts = 24) {
+    const requested = new Set(outputIds.map(String));
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
+      const outputs = await this.getOutputs(1);
+      const selected = new Set(
+        outputs.filter((output) => output.selected).map((output) => String(output.id))
+      );
+      if ([...requested].every((id) => selected.has(id))) return outputs;
+      if (attempt < attempts - 1) await sleep(250);
+    }
+    throw new Error(
+      "OwnTone konnte die ausgewählten HomePods nicht aktivieren. Prüfe in Apple Home unter „Lautsprecher & TV“, ob Geräte im selben Netzwerk zugreifen dürfen."
+    );
   }
 
   async pairOutput(outputId, pin) {
@@ -108,7 +136,9 @@ export class OwnToneClient {
     await this.prepareOutputs(outputIds, volume);
     await this.request("/api/queue/clear", { method: "PUT" });
     const query = new URLSearchParams({ playback: "start", shuffle: "false", uris: track.uri });
-    await this.request(`/api/queue/items/add?${query}`, { method: "POST" });
+    const queued = await this.request(`/api/queue/items/add?${query}`, { method: "POST" });
+    if (!queued?.count) throw new Error("OwnTone hat die Audiodatei nicht in die Warteschlange gelegt.");
+    return queued;
   }
 }
 

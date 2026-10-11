@@ -87,6 +87,13 @@ function showAudioMode(mode) {
   elements.uploadPanel.classList.toggle("hidden", !upload);
 }
 
+function updateVolumeVisual(value) {
+  const normalized = Math.min(100, Math.max(0, Number(value) || 0));
+  elements.volumeValue.textContent = `${normalized} %`;
+  elements.volume.style.background =
+    `linear-gradient(90deg, var(--blue) 0 ${normalized}%, #e2e7ec ${normalized}% 100%)`;
+}
+
 function renderOutputs(outputs, settings) {
   elements.outputs.replaceChildren();
   if (!outputs.length) {
@@ -133,7 +140,7 @@ function applyForm(settings) {
   elements.textCount.textContent = `${settings.announcementText.length} / 240`;
   elements.useAll.checked = settings.useAllOutputs;
   elements.volume.value = settings.volume;
-  elements.volumeValue.textContent = `${settings.volume} %`;
+  updateVolumeVisual(settings.volume);
   elements.cooldown.value = settings.cooldownSeconds;
   elements.scheduleEnabled.checked = settings.scheduleEnabled;
   elements.activeFrom.value = settings.activeFrom;
@@ -202,7 +209,7 @@ elements.audioFile.addEventListener("change", () => {
 });
 elements.volume.addEventListener("input", () => {
   markDirty();
-  elements.volumeValue.textContent = `${elements.volume.value} %`;
+  updateVolumeVisual(elements.volume.value);
 });
 elements.useAll.addEventListener("change", () => {
   markDirty();
