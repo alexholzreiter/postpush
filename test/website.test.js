@@ -111,8 +111,8 @@ test("public Runtipi metadata is written in English", async () => {
     read("apps/postpush/metadata/description.md"),
   ]);
   const config = JSON.parse(configSource);
-  assert.equal(config.version, "0.2.10");
-  assert.equal(config.tipi_version, 11);
+  assert.equal(config.version, "0.2.11");
+  assert.equal(config.tipi_version, 12);
   assert.equal(config.form_fields[0].label, "MQTT broker");
   assert.match(description, /PostPush announces new mail/);
   assert.doesNotMatch(description, /PostPush meldet/);

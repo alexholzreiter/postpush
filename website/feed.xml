@@ -5,8 +5,15 @@
     <link>https://postpush.klickwerk.digital/</link>
     <description>Release updates for the self-hosted MQTT-to-AirPlay mailbox announcement bridge.</description>
     <language>en</language>
-    <lastBuildDate>Sun, 11 Oct 2026 08:00:00 +0200</lastBuildDate>
+    <lastBuildDate>Sun, 11 Oct 2026 08:15:00 +0200</lastBuildDate>
     <atom:link href="https://postpush.klickwerk.digital/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>PostPush 0.2.11</title>
+      <link>https://github.com/alexholzreiter/postpush/releases/tag/v0.2.11</link>
+      <guid isPermaLink="true">https://github.com/alexholzreiter/postpush/releases/tag/v0.2.11</guid>
+      <pubDate>Sun, 11 Oct 2026 08:15:00 +0200</pubDate>
+      <description>Version 0.2.11 removes the white matte around the PostPush icon in Runtipi.</description>
+    </item>
     <item>
       <title>PostPush 0.2.10</title>
       <link>https://github.com/alexholzreiter/postpush/releases/tag/v0.2.10</link>
