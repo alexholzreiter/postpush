@@ -70,6 +70,26 @@ Runtipi host. PostPush deliberately reuses its OwnTone service to avoid two
 conflicting mDNS stacks. The standalone Docker Compose setup includes its own
 OwnTone service and does not require the DoorBell app.
 
+## Reference hardware
+
+PostPush works with any sensor that Home Assistant can turn into an MQTT event.
+This is the setup it is developed and tested with:
+
+| Part | Model | Role |
+|---|---|---|
+| Mailbox sensor | HOBEIAN ZG-204ZL (Zigbee PIR motion and light sensor, battery powered) | Mounted inside the mailbox; detects the flap or a letter dropping in |
+| Zigbee coordinator | SONOFF Zigbee 3.0 USB Dongle Plus (Z-Stack) | Connects the sensor to Zigbee2MQTT |
+| Zigbee bridge | Zigbee2MQTT 2.14 on a Raspberry Pi | Publishes the sensor state to MQTT |
+| MQTT broker | Eclipse Mosquitto | Shared by Zigbee2MQTT, Home Assistant, and PostPush |
+| Automation | Home Assistant | Sends the PostPush MQTT event when the sensor turns on |
+| Server | x86-64 Linux host with Runtipi | Runs PostPush and OwnTone |
+| Speakers | Apple HomePods (HomePod OS 27) | Play the announcement over AirPlay 2 |
+
+The reference sensor runs with `sensitivity: high` and `keep_time: 30` in
+Zigbee2MQTT. Its occupancy entity
+(`binary_sensor.<device>_occupancy`) is the trigger in the Home Assistant
+automation below.
+
 ## Install on Runtipi
 
 This repository is also a custom Runtipi app store. In Runtipi, open
