@@ -47,6 +47,8 @@ test("DoorBell visual language includes the PostPush mailbox hero", () => {
   assert.match(css, /width: min\(1220px, calc\(100% - 40px\)\)/);
   assert.match(css, /min-height: 530px/);
   assert.match(css, /border-radius: 38px/);
+  assert.match(css, /font-size: clamp\(44px, 4\.55vw, 58px\)/);
+  assert.match(css, /\.hero h1 em \{[^}]*white-space: nowrap;/);
 });
 
 test("local interface is English and the live icon has no white matte", () => {

@@ -52,8 +52,8 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .hero-copy { position: relative; z-index: 2; min-width: 0; padding: 68px 34px 34px 70px; }
 .hero-label { display: inline-flex; align-items: center; gap: 8px; color: #c8c7d2; font-size: 11px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
 .hero-label i { width: 7px; height: 7px; border-radius: 50%; background: #5ee0a5; box-shadow: 0 0 0 5px rgba(94, 224, 165, .11); }
-.hero h1 { margin: 24px 0 18px; font-family: "Avenir Next", Inter, sans-serif; font-size: clamp(48px, 5.35vw, 70px); line-height: .99; letter-spacing: -.065em; }
-.hero h1 em { color: #ff7449; font-style: normal; }
+.hero h1 { margin: 24px 0 18px; font-family: "Avenir Next", Inter, sans-serif; font-size: clamp(44px, 4.55vw, 58px); line-height: 1.02; letter-spacing: -.06em; }
+.hero h1 em { color: #ff7449; font-style: normal; white-space: nowrap; }
 .hero-copy > p { width: min(560px, 94%); margin: 0; color: #aeacb9; font-size: 16px; line-height: 1.7; }
 .hero-actions { display: flex; align-items: center; gap: 12px; margin-top: 32px; }
 .button { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 0; border-radius: 13px; padding: 0 18px; font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; transition: transform .18s, box-shadow .18s, background .18s; }
@@ -269,6 +269,7 @@ footer span:first-child { color: #63626a; font-weight: 700; }
   .hero { min-height: auto; grid-template-columns: 1fr; border-radius: 28px; }
   .hero-copy { padding: 44px 25px 160px; }
   .hero h1 { font-size: clamp(44px, 15vw, 64px); }
+  .hero h1 em { white-space: normal; }
   .hero-copy > p { width: 100%; }
   .hero-visual { display: none; }
   .connection-strip { bottom: 20px; }

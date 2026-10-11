@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/postpush-hero.svg" alt="PostPush — mailbox announcements on HomePods" width="100%">
+  <img src="docs/postpush-hero.png" alt="PostPush — mailbox announcements on HomePods" width="100%">
 </p>
 
 <p align="center">
@@ -33,7 +33,7 @@ speaker selection, active hours, volume, cooldown, and master switch.
 ## How it works
 
 <p align="center">
-  <img src="docs/postpush-flow.svg" alt="Mailbox sensor to Home Assistant, MQTT, PostPush, and HomePods" width="100%">
+  <img src="docs/postpush-flow.png" alt="Mailbox sensor to PostPush and HomePods" width="100%">
 </p>
 
 Home Assistant publishes a non-retained MQTT event when the mailbox sensor

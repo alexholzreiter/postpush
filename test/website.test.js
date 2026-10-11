@@ -111,21 +111,27 @@ test("AI discovery, feed, about page, and README remain consistent", async () =>
   assert.equal(JSON.parse(service).capabilities.audioFormats.count, 6);
   assert.match(feed, new RegExp(`PostPush ${JSON.parse(packageJson).version}`));
   assert.match(about, /Created and maintained by Alexander Holzreiter/);
-  assert.match(readme, /docs\/postpush-hero\.svg/);
+  assert.match(readme, /docs\/postpush-hero\.png/);
   assert.match(readme, /Tip%20a%20coffee/);
 });
 
-test("GitHub artwork is self-contained and uses the website mailbox flow", async () => {
-  const [hero, flow] = await Promise.all([
+test("GitHub artwork uses the real logo and renders to stable PNGs", async () => {
+  const [hero, flow, heroPng, flowPng] = await Promise.all([
     read("docs/postpush-hero.svg"),
     read("docs/postpush-flow.svg"),
+    readFile(new URL("../docs/postpush-hero.png", import.meta.url)),
+    readFile(new URL("../docs/postpush-flow.png", import.meta.url)),
   ]);
-  assert.doesNotMatch(hero, /<image\b/);
-  assert.doesNotMatch(flow, /<image\b/);
+  assert.match(hero, /<image href="postpush-icon\.png"/);
+  assert.match(flow, /<image href="postpush-icon\.png"/);
   assert.match(hero, /Same clean mailbox silhouette used on the project website/);
   assert.match(flow, /The sensor detects mail/);
   assert.match(flow, /PostPush prepares the message/);
   assert.match(flow, /OwnTone plays in sync/);
+  assert.equal(heroPng.readUInt32BE(16), 1440);
+  assert.equal(heroPng.readUInt32BE(20), 580);
+  assert.equal(flowPng.readUInt32BE(16), 1200);
+  assert.equal(flowPng.readUInt32BE(20), 360);
 });
 
 test("public Runtipi metadata is written in English", async () => {
@@ -134,8 +140,8 @@ test("public Runtipi metadata is written in English", async () => {
     read("apps/postpush/metadata/description.md"),
   ]);
   const config = JSON.parse(configSource);
-  assert.equal(config.version, "0.2.12");
-  assert.equal(config.tipi_version, 13);
+  assert.equal(config.version, "0.2.13");
+  assert.equal(config.tipi_version, 14);
   assert.equal(config.form_fields[0].label, "MQTT broker");
   assert.match(description, /PostPush announces new mail/);
   assert.doesNotMatch(description, /PostPush meldet/);
