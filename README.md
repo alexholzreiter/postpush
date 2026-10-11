@@ -65,11 +65,10 @@ All application settings and audio files remain on the local server.
 - a Runtipi or Docker host on the same local network/VLAN as the HomePods
 - Apple Home: **Home Settings → Speakers & TV → Anyone On the Same Network**
 
-For the current Runtipi package, Ring HomePod Doorbell must run on the same
-Runtipi host. PostPush reuses its OwnTone service: AirPlay 2 on HomePod OS 27
-needs the fixed PTP ports 319 and 320, so only one OwnTone instance can run per
-host. The standalone Docker Compose setup includes its own OwnTone service and
-does not require the DoorBell app.
+On Runtipi, [Ring HomePod Doorbell](https://github.com/alexholzreiter/ring-homepod-doorbell)
+must be installed on the same host first, because PostPush plays through its
+OwnTone service. See [Why Ring HomePod Doorbell is required](#why-ring-homepod-doorbell-is-required).
+The standalone Docker Compose setup brings its own OwnTone and does not need it.
 
 ## Reference hardware
 
@@ -93,20 +92,56 @@ automation below.
 
 ## Install on Runtipi
 
-This repository is also a custom Runtipi app store. In Runtipi, open
-**Settings → App Stores** and add:
+1. **Install Ring HomePod Doorbell first.** In Runtipi, open
+   **Settings → App Stores** and add its store under the name **`doorbell`**:
 
-```text
-https://github.com/alexholzreiter/postpush
-```
+   ```text
+   https://github.com/alexholzreiter/ring-homepod-doorbell
+   ```
 
-PostPush then appears in the App Store. During installation, configure the
-MQTT broker URL, username, password, and topic. A dedicated MQTT account named
-`postpush` with read access to `postpush/events/mail` is recommended.
+   Install the app and check that it finds your HomePods. The store name
+   matters: PostPush expects the DoorBell data under
+   `app-data/doorbell/ring-homepod-doorbell`.
 
-The Runtipi package uses port `8586` for the web interface and connects to the
-shared OwnTone instance on port `3689`. The app is intentionally not exposable
-through Runtipi and should remain available only on the trusted home network.
+2. **Add the PostPush store** in the same place:
+
+   ```text
+   https://github.com/alexholzreiter/postpush
+   ```
+
+3. **Install PostPush** and enter the MQTT broker URL, username, password, and
+   topic. A dedicated MQTT account named `postpush` with read access to
+   `postpush/events/mail` is recommended.
+
+4. Open `http://YOUR-SERVER-IP:8586`, select the HomePods, and press
+   **Test announcement**.
+
+PostPush uses port `8586` for its web interface. The app is intentionally not
+exposable through Runtipi and should remain available only on the trusted home
+network.
+
+### Why Ring HomePod Doorbell is required
+
+HomePods on HomePod OS 27 need AirPlay 2 timing over the fixed PTP ports `319`
+and `320`. Only one OwnTone instance per host can hold these ports, so two apps
+that each start their own OwnTone cannot run side by side. The Runtipi package
+therefore does not start its own OwnTone and shares the DoorBell's instance:
+
+| Shared resource | Where |
+|---|---|
+| OwnTone API | `http://127.0.0.1:3689` |
+| Audio files | `app-data/doorbell/ring-homepod-doorbell/data/media`, mounted as `/data/media` |
+
+What this means in practice:
+
+- **Uninstalling, stopping, or reinstalling the DoorBell app stops PostPush
+  announcements.** Restarting or updating it interrupts them briefly.
+- PostPush stores its generated speech and uploaded sounds in the DoorBell's
+  media folder (files starting with `postpush-`). After a fresh DoorBell
+  install, upload a custom sound again; speech is regenerated automatically.
+- A mailbox announcement and a doorbell chime use the same player. If both are
+  triggered at the same moment, the later one replaces the earlier one.
+- Do not install another OwnTone app on the same host.
 
 ## Connect Home Assistant
 
@@ -158,6 +193,16 @@ The standalone stack uses:
 - port `8586` for the PostPush web interface
 - port `3690` for its dedicated OwnTone instance
 - `data/` for persistent settings, generated speech, uploads, and OwnTone state
+
+## Troubleshooting
+
+| Symptom | Check |
+|---|---|
+| The web interface says "Announcement played", but nothing is audible | HomePods buffer several seconds before they play. PostPush adds 1.5 s of silence before and 5 s after every announcement; increase `PLAYBACK_LEAD_IN_MS` or `PLAYBACK_TAIL_MS` if the start or end is still cut off. |
+| Test works, but the mailbox does not trigger anything | **Last MQTT message** stays empty: the Home Assistant automation does not publish to the PostPush topic. A phone-notification automation alone does not send MQTT; add the automation from [Connect Home Assistant](#connect-home-assistant) and check its traces. |
+| "The selected audio file could not be found." | The DoorBell app was reinstalled and its media folder is new. Upload the custom sound again. |
+| No HomePods listed | Apple Home → Home Settings → Speakers & TV → **Anyone On the Same Network**, and the DoorBell app must be running. |
+| OwnTone unavailable | Check that the DoorBell's `owntone` container is running. |
 
 ## Privacy and behavior
 
