@@ -79,7 +79,7 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .hero-visual { position: relative; min-width: 0; padding: 44px 0 52px 22px; }
 .glow { position: absolute; z-index: -1; width: 540px; height: 540px; top: 50%; left: 53%; translate: -50% -50%; border-radius: 50%; background: radial-gradient(circle, rgba(255,96,48,.19), rgba(111,86,231,.06) 45%, transparent 70%); }
 .browser-frame { overflow: hidden; border: 1px solid rgba(255,255,255,.11); border-radius: 22px; background: #1b1c26; box-shadow: 0 38px 90px rgba(25,23,21,.25); transform: perspective(1100px) rotateY(-3deg) rotateX(1deg); }
-.browser-frame img { width: 100%; display: block; }
+.browser-frame img { width: 100%; height: auto; display: block; }
 .browser-bar { height: 38px; display: flex; align-items: center; gap: 6px; background: #20212c; padding: 0 13px; }
 .browser-bar > span { width: 7px; height: 7px; border-radius: 50%; background: #4e4e59; }
 .browser-bar > span:first-child { background: #ff684b; }

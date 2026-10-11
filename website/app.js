@@ -14,6 +14,9 @@ function setLanguage(language) {
     element.setAttribute("aria-label", element.dataset[`${nextLanguage}Aria`]);
   });
 
+  document.querySelectorAll("[data-en-src]").forEach((element) => {
+    element.setAttribute("src", element.dataset[`${nextLanguage}Src`]);
+  });
   document.querySelectorAll("[data-en-alt]").forEach((element) => {
     element.setAttribute("alt", element.dataset[`${nextLanguage}Alt`]);
   });
