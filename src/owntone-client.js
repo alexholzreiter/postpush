@@ -139,7 +139,7 @@ export class OwnToneClient {
     return this.configureOutput(outputId, { pin });
   }
 
-  async playTrack(track, outputIds, volume) {
+  async playTracks(tracks, outputIds, volume) {
     const outputs = await this.getOutputs();
     const availableIds = new Set(outputs.map((output) => String(output.id)));
     const missingIds = outputIds.filter((id) => !availableIds.has(String(id)));
@@ -148,9 +148,12 @@ export class OwnToneClient {
     }
     await this.prepareOutputs(outputIds, volume);
     await this.request("/api/queue/clear", { method: "PUT" });
-    const query = new URLSearchParams({ playback: "start", shuffle: "false", uris: track.uri });
+    const uris = tracks.map((track) => track.uri).join(",");
+    const query = new URLSearchParams({ playback: "start", shuffle: "false", uris });
     const queued = await this.request(`/api/queue/items/add?${query}`, { method: "POST" });
-    if (!queued?.count) throw new Error("OwnTone did not add the audio file to the queue.");
+    if (queued?.count !== tracks.length) {
+      throw new Error("OwnTone did not add the audio file to the queue.");
+    }
     return queued;
   }
 }

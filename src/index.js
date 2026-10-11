@@ -8,6 +8,7 @@ import multer from "multer";
 import { isAirPlayOutput, OwnToneClient, selectOutputIds } from "./owntone-client.js";
 import { evaluateMailEvent, isMailPayload } from "./schedule.js";
 import { createSettingsStore, normalizeSettings } from "./settings.js";
+import { ensureSilenceFile } from "./silence.js";
 import { synthesizeSpeech } from "./tts.js";
 
 const DATA_DIR = process.env.DATA_DIR || "/data";
@@ -21,6 +22,10 @@ const MQTT_PASSWORD = process.env.MQTT_PASSWORD || undefined;
 const MQTT_TOPIC = process.env.MQTT_TOPIC || "postpush/events/mail";
 const ANNOUNCEMENT_FILENAME = "postpush-announcement.wav";
 const ANNOUNCEMENT_FILE = path.join(MEDIA_DIR, ANNOUNCEMENT_FILENAME);
+const LEAD_IN_FILENAME = "postpush-lead-in.wav";
+const TAIL_FILENAME = "postpush-tail.wav";
+const LEAD_IN_MS = Number(process.env.PLAYBACK_LEAD_IN_MS || 1500);
+const TAIL_MS = Number(process.env.PLAYBACK_TAIL_MS || 5000);
 const ALLOWED_EXTENSIONS = new Set(["aac", "flac", "m4a", "mp3", "ogg", "wav"]);
 
 fs.mkdirSync(MEDIA_DIR, { recursive: true });
@@ -83,6 +88,16 @@ async function ensureAnnouncement() {
   await generateAnnouncement();
 }
 
+async function ensurePadding() {
+  const leadInWritten = ensureSilenceFile(path.join(MEDIA_DIR, LEAD_IN_FILENAME), LEAD_IN_MS);
+  const tailWritten = ensureSilenceFile(path.join(MEDIA_DIR, TAIL_FILENAME), TAIL_MS);
+  if (leadInWritten || tailWritten) await ownTone.rescan();
+  return {
+    leadIn: await ownTone.findTrack(LEAD_IN_FILENAME),
+    tail: await ownTone.findTrack(TAIL_FILENAME),
+  };
+}
+
 async function getOwnToneOutputs() {
   try {
     const outputs = await ownTone.getOutputs();
@@ -114,12 +129,23 @@ async function playAnnouncement() {
     if (!outputIds.length) {
       throw new Error("No selected, reachable HomePods were found.");
     }
+    const paddingTracks = await ensurePadding();
     const track = await ownTone.findTrack(activeFilename);
-    await ownTone.playTrack(track, outputIds, settings.volume);
+    // AirPlay 2 receivers buffer several seconds before they output audio, and
+    // OwnTone tears the session down once the queue runs out. Short clips were
+    // therefore never audible on HomePods; surrounding them with silence keeps
+    // the session alive until the announcement has actually been heard.
+    await ownTone.playTracks(
+      [paddingTracks.leadIn, track, paddingTracks.tail],
+      outputIds,
+      settings.volume
+    );
     state.lastPlaybackAt = new Date().toISOString();
     console.log(`Mailbox announcement started on ${outputIds.length} AirPlay output(s).`);
     const playbackTime = Math.min(Math.max(Number(track.length_ms) || 4000, 1000), 30000);
-    await new Promise((resolve) => setTimeout(resolve, playbackTime + 500));
+    await new Promise((resolve) =>
+      setTimeout(resolve, LEAD_IN_MS + playbackTime + TAIL_MS + 500)
+    );
   } finally {
     state.playbackActive = false;
   }

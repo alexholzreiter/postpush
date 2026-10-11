@@ -143,3 +143,39 @@ test("output preparation fails when OwnTone never activates the requested speake
     /could not activate the selected HomePods/
   );
 });
+
+test("several tracks are queued in order with a single request", async () => {
+  const requests = [];
+  const client = new OwnToneClient("http://owntone.test", {
+    fetch: async (url, options) => {
+      requests.push({ method: options.method, url });
+      if (url.endsWith("/api/outputs")) {
+        return {
+          headers: { get: () => "application/json" },
+          ok: true,
+          status: 200,
+          json: async () => ({ outputs: [{ id: "kitchen", selected: true }] }),
+        };
+      }
+      if (url.includes("/api/queue/items/add")) {
+        return {
+          headers: { get: () => "application/json" },
+          ok: true,
+          status: 200,
+          json: async () => ({ count: 3 }),
+        };
+      }
+      return { headers: { get: () => "" }, ok: true, status: 204, text: async () => "" };
+    },
+  });
+
+  await client.playTracks(
+    [{ uri: "library:track:1" }, { uri: "library:track:2" }, { uri: "library:track:3" }],
+    ["kitchen"],
+    50
+  );
+
+  const added = new URL(requests.find((request) => request.url.includes("/api/queue/items/add")).url);
+  assert.equal(added.searchParams.get("uris"), "library:track:1,library:track:2,library:track:3");
+  assert.equal(added.searchParams.get("playback"), "start");
+});
