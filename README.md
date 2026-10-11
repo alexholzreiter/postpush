@@ -44,7 +44,7 @@ announcement to the configured AirPlay outputs.
 ## Web interface
 
 <p align="center">
-  <img src="docs/screenshots/web-overview.png" alt="PostPush playback and schedule controls" width="100%">
+  <img src="docs/screenshots/web-overview-en.png" alt="PostPush playback and schedule controls" width="100%">
 </p>
 
 The interface provides:
