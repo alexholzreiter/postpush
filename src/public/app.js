@@ -1,3 +1,6 @@
+import { localizeServerMessage, resolveLanguage, translate } from "./i18n.js";
+
+const LANGUAGE_STORAGE_KEY = "postpush-language";
 const $ = (selector) => document.querySelector(selector);
 const elements = {
   activeFrom: $("#active-from"),
@@ -14,6 +17,7 @@ const elements = {
   currentAudioName: $("#current-audio-name"),
   customAudioPlayer: $("#custom-audio-player"),
   enabled: $("#enabled"),
+  languageButtons: [...document.querySelectorAll("[data-language]")],
   lastError: $("#last-error"),
   lastEvent: $("#last-event"),
   lastMqtt: $("#last-mqtt"),
@@ -27,6 +31,7 @@ const elements = {
   outputs: $("#outputs"),
   refresh: $("#refresh"),
   save: $("#save"),
+  saveLabel: $("#save-label"),
   scheduleEnabled: $("#schedule-enabled"),
   test: $("#test-announcement"),
   textCount: $("#text-count"),
@@ -46,9 +51,49 @@ let formDirty = false;
 let noticeTimer;
 let lastKnownOutputs = [];
 
+function readStoredLanguage() {
+  try {
+    return window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+let language = resolveLanguage(readStoredLanguage(), navigator.languages ?? [navigator.language]);
+const t = (key, values) => translate(language, key, values);
+
+function applyTranslations() {
+  document.documentElement.lang = language;
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = t(element.dataset.i18n);
+  });
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+    element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+  });
+  document.querySelectorAll("[data-i18n-title]").forEach((element) => {
+    element.title = t(element.dataset.i18nTitle);
+  });
+  elements.languageButtons.forEach((button) => {
+    const active = button.dataset.language === language;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+}
+
+function changeLanguage(nextLanguage) {
+  language = resolveLanguage(nextLanguage);
+  try {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  } catch {
+    // The choice still applies for this visit.
+  }
+  applyTranslations();
+  if (current) renderStatus(current);
+}
+
 function formatDate(value) {
   return value
-    ? new Intl.DateTimeFormat("en-GB", { dateStyle: "short", timeStyle: "medium" }).format(
+    ? new Intl.DateTimeFormat(language === "de" ? "de-AT" : "en-GB", { dateStyle: "short", timeStyle: "medium" }).format(
         new Date(value)
       )
     : "–";
@@ -56,7 +101,7 @@ function formatDate(value) {
 
 function showNotice(message, success = false) {
   clearTimeout(noticeTimer);
-  elements.notice.textContent = message;
+  elements.notice.textContent = localizeServerMessage(language, message);
   elements.notice.className = `notice${success ? " success" : ""}`;
   noticeTimer = setTimeout(() => (elements.notice.className = "notice hidden"), 6000);
 }
@@ -99,7 +144,7 @@ function renderOutputs(outputs, settings) {
   if (!outputs.length) {
     const empty = document.createElement("p");
     empty.className = "empty";
-    empty.textContent = "No HomePods found yet. Check the network and AirPlay access.";
+    empty.textContent = t("noHomePodsFound");
     elements.outputs.append(empty);
     return;
   }
@@ -113,9 +158,11 @@ function renderOutputs(outputs, settings) {
     const copy = document.createElement("span");
     copy.className = "output-copy";
     const name = document.createElement("strong");
-    name.textContent = output.name || "AirPlay speaker";
+    name.textContent = output.name || t("airplaySpeaker");
     const detail = document.createElement("small");
-    detail.textContent = requiresApproval ? "AirPlay PIN required" : `Current volume ${output.volume ?? "–"} %`;
+    detail.textContent = requiresApproval
+      ? t("pinRequired")
+      : t("currentVolume", { volume: output.volume ?? "–" });
     copy.append(name, detail);
     const check = document.createElement("span");
     check.className = "check";
@@ -152,15 +199,15 @@ function applyForm(settings) {
 function renderStatus(data) {
   const outputs = data.outputs.length ? data.outputs : lastKnownOutputs;
   if (data.outputs.length) lastKnownOutputs = data.outputs;
-  setStatus(elements.mqttDot, elements.mqttStatus, data.mqttConnected, "Connected", "Disconnected");
-  setStatus(elements.airplayDot, elements.airplayStatus, data.ownToneConnected, `${outputs.length} found`, "Unavailable");
+  setStatus(elements.mqttDot, elements.mqttStatus, data.mqttConnected, t("connected"), t("disconnected"));
+  setStatus(elements.airplayDot, elements.airplayStatus, data.ownToneConnected, t("foundOutputs", { count: outputs.length }), t("unavailable"));
   const activeAudioReady =
     data.settings.audioMode === "upload" ? Boolean(data.customAudioUrl) : data.ttsReady;
   const audioLabel =
     data.settings.audioMode === "upload"
-      ? data.settings.customAudioOriginalName || "Custom file"
-      : "Local voice ready";
-  setStatus(elements.ttsDot, elements.ttsStatus, activeAudioReady, audioLabel, "Preparing");
+      ? data.settings.customAudioOriginalName || t("customFile")
+      : t("localVoiceReady");
+  setStatus(elements.ttsDot, elements.ttsStatus, activeAudioReady, audioLabel, t("preparing"));
   elements.currentAudio.classList.toggle("hidden", !data.customAudioUrl);
   elements.currentAudioName.textContent = data.settings.customAudioOriginalName || "–";
   if (data.customAudioUrl) {
@@ -168,13 +215,15 @@ function renderStatus(data) {
     if (!elements.customAudioPlayer.src.endsWith(nextSource)) elements.customAudioPlayer.src = nextSource;
   }
   elements.lastEvent.textContent = formatDate(data.lastEventAt);
-  elements.lastOutcome.textContent = data.lastEventOutcome || "No event yet";
+  elements.lastOutcome.textContent = data.lastEventOutcome
+    ? localizeServerMessage(language, data.lastEventOutcome)
+    : t("noEventYet");
   elements.lastPlayback.textContent = formatDate(data.lastPlaybackAt);
   elements.lastMqtt.textContent = formatDate(data.mqttLastMessageAt);
   elements.mqttTopic.textContent = data.mqttTopic;
   elements.mqttTopic.title = data.mqttTopic;
-  elements.outputCount.textContent = `${outputs.length} found`;
-  elements.lastError.textContent = data.lastError || "–";
+  elements.outputCount.textContent = t("foundOutputs", { count: outputs.length });
+  elements.lastError.textContent = localizeServerMessage(language, data.lastError || "–");
   elements.lastError.title = data.lastError || "";
   if (!formDirty) applyForm(data.settings);
 }
@@ -186,7 +235,7 @@ async function loadStatus({ quiet = false, forceForm = false } = {}) {
     if (forceForm) formDirty = false;
     renderStatus(data);
   } catch (error) {
-    if (!quiet) showNotice(`Could not load status: ${error.message}`);
+    if (!quiet) showNotice(t("statusLoadFailed", { message: localizeServerMessage(language, error.message) }));
   }
 }
 
@@ -205,7 +254,7 @@ elements.audioMode.forEach((input) => {
   });
 });
 elements.audioFile.addEventListener("change", () => {
-  elements.audioFileLabel.textContent = elements.audioFile.files[0]?.name || "Choose an audio file";
+  elements.audioFileLabel.textContent = elements.audioFile.files[0]?.name || t("chooseAudioFile");
 });
 elements.volume.addEventListener("input", () => {
   markDirty();
@@ -231,32 +280,32 @@ elements.outputs.addEventListener("change", markDirty);
 elements.audioUploadForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!elements.audioFile.files.length) {
-    showNotice("Choose an audio file first.");
+    showNotice(t("chooseFileFirst"));
     return;
   }
   elements.uploadAudio.disabled = true;
-  elements.uploadAudio.textContent = "Uploading …";
+  elements.uploadAudio.textContent = t("uploading");
   try {
     const result = await api("/api/custom-audio", {
       method: "POST",
       body: new FormData(elements.audioUploadForm),
     });
     elements.audioUploadForm.reset();
-    elements.audioFileLabel.textContent = "Choose an audio file";
+    elements.audioFileLabel.textContent = t("chooseAudioFile");
     formDirty = false;
-    showNotice(`“${result.originalName}” was uploaded and selected.`, true);
+    showNotice(t("uploaded", { name: result.originalName }), true);
     await loadStatus({ quiet: true, forceForm: true });
   } catch (error) {
     showNotice(error.message);
   } finally {
     elements.uploadAudio.disabled = false;
-    elements.uploadAudio.textContent = "Upload file";
+    elements.uploadAudio.textContent = t("upload");
   }
 });
 
 elements.save.addEventListener("click", async () => {
   elements.save.disabled = true;
-  elements.save.textContent = "Preparing announcement …";
+  elements.saveLabel.textContent = t("preparingAnnouncement");
   try {
     const result = await api("/api/settings", {
       method: "PUT",
@@ -275,13 +324,13 @@ elements.save.addEventListener("click", async () => {
       }),
     });
     formDirty = false;
-    showNotice(result.warning || "Settings and announcement saved.", true);
+    showNotice(result.warning || t("settingsSaved"), true);
     await loadStatus({ quiet: true, forceForm: true });
   } catch (error) {
     showNotice(error.message);
   } finally {
     elements.save.disabled = false;
-    elements.save.textContent = "Save settings";
+    elements.saveLabel.textContent = t("saveSettings");
   }
 });
 
@@ -289,7 +338,7 @@ elements.test.addEventListener("click", async () => {
   elements.test.disabled = true;
   try {
     await api("/api/test-announcement", { method: "POST" });
-    showNotice("Test announcement played.", true);
+    showNotice(t("testPlayed"), true);
     await loadStatus({ quiet: true });
   } catch (error) {
     showNotice(error.message);
@@ -298,7 +347,11 @@ elements.test.addEventListener("click", async () => {
   }
 });
 
+elements.languageButtons.forEach((button) => {
+  button.addEventListener("click", () => changeLanguage(button.dataset.language));
+});
 elements.refresh.addEventListener("click", () => loadStatus({ forceForm: !formDirty }));
 
+applyTranslations();
 await loadStatus();
 setInterval(() => loadStatus({ quiet: true }), 10000);

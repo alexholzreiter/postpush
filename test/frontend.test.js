@@ -51,17 +51,19 @@ test("DoorBell visual language includes the PostPush mailbox hero", () => {
   assert.match(css, /\.hero h1 em \{[^}]*white-space: nowrap;/);
 });
 
-test("local interface is English and the live icon has no white matte", () => {
+test("local interface offers English and German and the live icon has no white matte", () => {
   const html = fs.readFileSync(path.join(root, "src/public/index.html"), "utf8");
   const script = fs.readFileSync(path.join(root, "src/public/app.js"), "utf8");
   const css = fs.readFileSync(path.join(root, "src/public/styles.css"), "utf8");
 
   assert.match(html, /<html lang="en">/);
-  assert.match(html, /Everything at a glance\./);
-  assert.match(html, /Save settings/);
-  assert.match(script, /Test announcement played\./);
-  assert.doesNotMatch(html, /Alles im Blick|Einstellungen speichern|Briefkasten|Wird geprüft|Lautstärke/);
-  assert.doesNotMatch(script, /Noch keine|Verbunden|Wird vorbereitet|gefunden|hochgeladen/);
+  assert.match(html, /data-language="en"/);
+  assert.match(html, /data-language="de"/);
+  assert.match(html, /data-i18n="glanceTitle">Everything at a glance\./);
+  assert.match(script, /from "\.\/i18n\.js"/);
+  assert.match(script, /localStorage\.setItem\(LANGUAGE_STORAGE_KEY/);
+  assert.doesNotMatch(script, /textContent = "[A-Z]/);
+  assert.match(css, /\.language-switcher button\.active/);
   assert.match(css, /\.live-logo \{[^}]*border: 0;[^}]*background: #f44a1b;/);
 });
 

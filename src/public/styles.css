@@ -36,6 +36,11 @@ svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: 
 .brand strong { font-family: "Avenir Next", Inter, sans-serif; font-size: 16px; letter-spacing: -.02em; }
 .brand small { color: var(--muted); font-size: 11px; margin-top: 1px; }
 .topbar-actions { display: flex; align-items: center; gap: 10px; }
+.language-switcher { display: flex; align-items: center; gap: 2px; border: 1px solid rgba(229, 225, 215, .9); border-radius: 11px; background: rgba(255, 255, 255, .72); padding: 3px; }
+.language-switcher button { min-width: 32px; height: 30px; border: 0; border-radius: 8px; background: transparent; color: #8a8990; font-size: 10px; font-weight: 800; letter-spacing: .05em; cursor: pointer; transition: color .18s, background .18s, box-shadow .18s; }
+.language-switcher button:hover { color: var(--ink); }
+.language-switcher button.active { background: var(--ink); box-shadow: 0 4px 12px rgba(23, 24, 34, .16); color: white; }
+.language-switcher button:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
 .privacy-chip { display: flex; align-items: center; gap: 7px; color: #5f606a; background: rgba(255, 255, 255, .72); border: 1px solid rgba(229, 225, 215, .9); border-radius: 999px; padding: 9px 13px; font-size: 12px; font-weight: 600; }
 .privacy-chip svg { width: 15px; height: 15px; color: var(--green); }
 .icon-button { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 12px; background: rgba(255, 255, 255, .72); cursor: pointer; transition: transform .2s, background .2s; }

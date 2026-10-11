@@ -63,7 +63,7 @@ test("application, image and Runtipi versions stay synchronized", () => {
   const config = JSON.parse(fs.readFileSync(path.join(storeApp, "config.json"), "utf8"));
   const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
   assert.equal(config.version, version);
-  assert.equal(config.tipi_version, 15);
+  assert.equal(config.tipi_version, 16);
   assert.match(compose, new RegExp(`postpush:${version.replaceAll(".", "\\.")}`));
   assert.match(compose, /schema_version: 2/);
 });

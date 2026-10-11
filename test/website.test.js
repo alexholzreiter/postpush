@@ -134,16 +134,15 @@ test("GitHub artwork uses the real logo and renders to stable PNGs", async () =>
   assert.equal(flowPng.readUInt32BE(20), 360);
 });
 
-test("public Runtipi metadata is offered in English and German", async () => {
+test("public Runtipi metadata is written in English", async () => {
   const [configSource, description] = await Promise.all([
     read("apps/postpush/config.json"),
     read("apps/postpush/metadata/description.md"),
   ]);
   const config = JSON.parse(configSource);
-  assert.equal(config.version, "0.2.14");
-  assert.equal(config.tipi_version, 15);
+  assert.equal(config.version, "0.2.15");
+  assert.equal(config.tipi_version, 16);
   assert.equal(config.form_fields[0].label, "MQTT broker");
   assert.match(description, /PostPush announces new mail/);
-  assert.match(description, /## Deutsch/);
-  assert.match(description, /PostPush kündigt neue Post/);
+  assert.doesNotMatch(description, /Deutsch|PostPush kündigt/);
 });
