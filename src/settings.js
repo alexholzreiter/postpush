@@ -4,7 +4,7 @@ import path from "node:path";
 export const DEFAULT_SETTINGS = Object.freeze({
   activeFrom: "05:00",
   activeUntil: "22:00",
-  announcementText: "Du hast Post bekommen.",
+  announcementText: "You have mail.",
   audioMode: "tts",
   cooldownSeconds: 30,
   customAudioFilename: null,

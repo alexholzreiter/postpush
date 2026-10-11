@@ -1,11 +1,24 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
     <meta name="theme-color" content="#f6f4ef">
     <title>PostPush</title>
+    <meta name="description" content="Configure local mailbox announcements for HomePods and AirPlay speakers with PostPush.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="PostPush">
+    <meta property="og:title" content="PostPush — Mailbox announcements on HomePods">
+    <meta property="og:description" content="A self-hosted MQTT-to-AirPlay bridge for spoken mailbox alerts and custom sounds.">
+    <meta property="og:image" content="/postpush-share.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="PostPush mailbox announcements on HomePods">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PostPush — Mailbox announcements on HomePods">
+    <meta name="twitter:description" content="New mail. Your announcement. Every room.">
+    <meta name="twitter:image" content="/postpush-share.png">
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/favicon-32.png" type="image/png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -17,17 +30,17 @@
     <div class="ambient ambient-two"></div>
 
     <div class="app-shell">
-      <nav class="topbar" aria-label="Hauptnavigation">
-        <a class="brand" href="/" aria-label="PostPush Startseite">
+      <nav class="topbar" aria-label="Main navigation">
+        <a class="brand" href="/" aria-label="PostPush home">
           <span class="brand-mark"><img src="/app-icon.png" alt=""></span>
-          <span><strong>PostPush</strong><small>Briefkasten × HomePod</small></span>
+          <span><strong>PostPush</strong><small>Mailbox × HomePod</small></span>
         </a>
         <div class="topbar-actions">
           <span class="privacy-chip">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 2.8 8.5 7 10 4.2-1.5 7-5.5 7-10V6l-7-3Z"/><path d="m9.5 12 1.7 1.7 3.6-4"/></svg>
-            Nur lokal
+            Local only
           </span>
-          <button id="refresh" class="icon-button" type="button" aria-label="Geräte neu suchen" title="Geräte neu suchen">
+          <button id="refresh" class="icon-button" type="button" aria-label="Refresh devices" title="Refresh devices">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 5v6h-6"/></svg>
           </button>
         </div>
@@ -37,20 +50,20 @@
 
       <header class="hero">
         <div class="hero-copy">
-          <span class="hero-label"><i></i> Bereit für deine Post</span>
-          <h1>Dein Briefkasten.<br><em>Deine Ansage.</em></h1>
-          <p>Wenn Post eingeworfen wird, hören es alle ausgewählten HomePods – mit genau der Ansage, die du möchtest.</p>
+          <span class="hero-label"><i></i> Ready for your mail</span>
+          <h1>Your mailbox.<br><em>Your announcement.</em></h1>
+          <p>When mail arrives, every selected HomePod plays exactly the announcement you want.</p>
           <div class="hero-actions">
             <button id="test-announcement" class="button button-primary" type="button">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7L8 5Z"/></svg>
-              Ansage testen
+              Test announcement
             </button>
-            <a class="button button-ghost" href="#setup">Einrichtung öffnen</a>
+            <a class="button button-ghost" href="#setup">Open setup</a>
           </div>
-          <div class="connection-strip" aria-label="Verbindungsstatus">
-            <div class="connection-item"><span id="mqtt-dot" class="status-dot"></span><span><small>Home Assistant</small><strong id="mqtt-status">Wird geprüft …</strong></span></div>
-            <div class="connection-item"><span id="airplay-dot" class="status-dot"></span><span><small>AirPlay</small><strong id="airplay-status">Wird geprüft …</strong></span></div>
-            <div class="connection-item"><span id="tts-dot" class="status-dot"></span><span><small>Audio</small><strong id="tts-status">Wird geprüft …</strong></span></div>
+          <div class="connection-strip" aria-label="Connection status">
+            <div class="connection-item"><span id="mqtt-dot" class="status-dot"></span><span><small>Home Assistant</small><strong id="mqtt-status">Checking …</strong></span></div>
+            <div class="connection-item"><span id="airplay-dot" class="status-dot"></span><span><small>AirPlay</small><strong id="airplay-status">Checking …</strong></span></div>
+            <div class="connection-item"><span id="tts-dot" class="status-dot"></span><span><small>Audio</small><strong id="tts-status">Checking …</strong></span></div>
           </div>
         </div>
 
@@ -76,38 +89,38 @@
       <main id="setup" class="dashboard">
         <div class="main-column">
           <section class="section-heading">
-            <div><span class="section-kicker">EINRICHTUNG</span><h2>In drei Schritten startklar</h2></div>
-            <span class="autosave-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Lokal gespeichert</span>
+            <div><span class="section-kicker">SETUP</span><h2>Ready in three steps</h2></div>
+            <span class="autosave-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Saved locally</span>
           </section>
 
           <section class="card setup-card sound-card">
             <div class="step-badge">01</div>
             <div class="card-content">
               <div class="card-heading">
-                <div><h3>Ansage auswählen</h3><p>Nutze lokalen Sprachtext oder lade deinen eigenen Sound hoch.</p></div>
+                <div><h3>Choose an announcement</h3><p>Use local text-to-speech or upload your own sound.</p></div>
                 <span class="format-chip">Audio · max. 25 MB</span>
               </div>
-              <div class="audio-tabs" role="radiogroup" aria-label="Art der Ansage">
-                <label><input type="radio" name="audio-mode" value="tts" checked><span>Text sprechen</span></label>
-                <label><input type="radio" name="audio-mode" value="upload"><span>Eigene Datei</span></label>
+              <div class="audio-tabs" role="radiogroup" aria-label="Announcement type">
+                <label><input type="radio" name="audio-mode" value="tts" checked><span>Speak text</span></label>
+                <label><input type="radio" name="audio-mode" value="upload"><span>Custom file</span></label>
               </div>
               <div id="tts-panel" class="audio-panel">
-                <label class="field-label" for="announcement-text">Ansagetext</label>
-                <div class="text-field"><textarea id="announcement-text" maxlength="240" rows="3">Du hast Post bekommen.</textarea><span id="text-count">24 / 240</span></div>
-                <p class="helper-text"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 2.9 8.4 7 10 4.1-1.6 7-5.5 7-10V6z"/><path d="m9 12 2 2 4-5"/></svg>Piper erzeugt die Sprache lokal. Dein Text verlässt das Heimnetz nicht.</p>
+                <label class="field-label" for="announcement-text">Announcement text</label>
+                <div class="text-field"><textarea id="announcement-text" maxlength="240" rows="3">You have mail.</textarea><span id="text-count">14 / 240</span></div>
+                <p class="helper-text"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.5 2.9 8.4 7 10 4.1-1.6 7-5.5 7-10V6z"/><path d="m9 12 2 2 4-5"/></svg>Piper generates speech locally. Your text never leaves your home network.</p>
               </div>
               <div id="upload-panel" class="audio-panel hidden">
                 <form id="audio-upload-form" class="upload-area">
                   <label class="drop-zone">
                     <input id="audio-file" name="audio" type="file" accept=".mp3,.wav,.m4a,.aac,.flac,.ogg,audio/*">
                     <span class="upload-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg></span>
-                    <span class="drop-copy"><strong id="audio-file-label">Audiodatei auswählen</strong><small>MP3, WAV, M4A, AAC, FLAC oder OGG</small></span>
+                    <span class="drop-copy"><strong id="audio-file-label">Choose an audio file</strong><small>MP3, WAV, M4A, AAC, FLAC or OGG</small></span>
                   </label>
-                  <button id="upload-audio" type="submit" class="button button-dark">Hochladen</button>
+                  <button id="upload-audio" type="submit" class="button button-dark">Upload</button>
                 </form>
                 <div id="current-audio" class="current-audio hidden">
                   <span class="current-audio-icon"><svg viewBox="0 0 24 24"><path d="M9 18V5l10-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/></svg></span>
-                  <span><small>AKTUELLE DATEI</small><strong id="current-audio-name">–</strong></span>
+                  <span><small>CURRENT FILE</small><strong id="current-audio-name">–</strong></span>
                   <audio id="custom-audio-player" controls preload="metadata"></audio>
                 </div>
               </div>
@@ -117,14 +130,14 @@
           <section class="card setup-card speakers-card">
             <div class="step-badge violet">02</div>
             <div class="card-content">
-              <div class="card-heading"><div><h3>HomePods auswählen</h3><p>Bestimme, wo die Post-Ansage abgespielt wird.</p></div></div>
+              <div class="card-heading"><div><h3>Select HomePods</h3><p>Choose where the mailbox announcement should play.</p></div></div>
               <label class="select-all-row">
                 <span class="select-all-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5a7 7 0 0 1 14 0v7a3.5 3.5 0 0 1-7 0v-7M8.5 15.5a3.5 3.5 0 0 0 7 0"/></svg></span>
-                <span class="select-all-copy"><strong>Alle AirPlay-Lautsprecher</strong><small>Neue HomePods automatisch einbeziehen</small></span>
+                <span class="select-all-copy"><strong>All AirPlay speakers</strong><small>Automatically include new HomePods</small></span>
                 <span class="switch"><input id="use-all" type="checkbox"><i></i></span>
               </label>
-              <div id="outputs" class="outputs"><p class="empty">Suche im lokalen Netzwerk …</p></div>
-              <p class="helper-text"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Kein HomePod sichtbar? Erlaube in Apple Home unter „Lautsprecher &amp; TV“ den Zugriff für alle im selben Netzwerk.</p>
+              <div id="outputs" class="outputs"><p class="empty">Searching the local network …</p></div>
+              <p class="helper-text"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>No HomePod visible? In Apple Home, allow speaker access for everyone on the same network.</p>
             </div>
           </section>
 
@@ -132,24 +145,24 @@
             <div class="step-badge blue">03</div>
             <div class="card-content">
               <div class="card-heading">
-                <div><h3>Wiedergabe einstellen</h3><p>So laut und zu den Zeiten, die für dein Zuhause passen.</p></div>
-                <label class="enabled-control"><span>Ansagen aktiv</span><span class="switch"><input id="enabled" type="checkbox"><i></i></span></label>
+                <div><h3>Configure playback</h3><p>Choose the volume and times that suit your home.</p></div>
+                <label class="enabled-control"><span>Announcements enabled</span><span class="switch"><input id="enabled" type="checkbox"><i></i></span></label>
               </div>
               <div class="control-grid">
-                <label class="range-control"><span class="control-title"><strong>Lautstärke</strong><output id="volume-value">55 %</output></span><input id="volume" type="range" min="1" max="100" value="55"><span class="range-labels"><small>Leise</small><small>Laut</small></span></label>
-                <label class="cooldown-control"><span class="control-title"><strong>Doppelte Meldungen vermeiden</strong><small>Sperrzeit</small></span><span class="number-field"><input id="cooldown" type="number" min="1" max="600" value="30"><span>Sek.</span></span></label>
+                <label class="range-control"><span class="control-title"><strong>Volume</strong><output id="volume-value">55 %</output></span><input id="volume" type="range" min="1" max="100" value="55"><span class="range-labels"><small>Quiet</small><small>Loud</small></span></label>
+                <label class="cooldown-control"><span class="control-title"><strong>Prevent duplicate alerts</strong><small>Cooldown</small></span><span class="number-field"><input id="cooldown" type="number" min="1" max="600" value="30"><span>sec.</span></span></label>
               </div>
               <div class="schedule-block">
-                <label class="schedule-heading"><span><strong>Zeitplan verwenden</strong><small>Außerhalb des Zeitfensters bleibt PostPush still.</small></span><span class="switch"><input id="schedule-enabled" type="checkbox"><i></i></span></label>
+                <label class="schedule-heading"><span><strong>Use schedule</strong><small>PostPush stays quiet outside this time window.</small></span><span class="switch"><input id="schedule-enabled" type="checkbox"><i></i></span></label>
                 <div id="time-grid" class="time-grid">
-                  <label><span>Aktiv ab</span><input id="active-from" type="time" value="05:00"></label>
+                  <label><span>Active from</span><input id="active-from" type="time" value="05:00"></label>
                   <span class="time-arrow">→</span>
-                  <label><span>Aktiv bis</span><input id="active-until" type="time" value="22:00"></label>
+                  <label><span>Active until</span><input id="active-until" type="time" value="22:00"></label>
                 </div>
               </div>
               <div class="save-row">
-                <span>Änderungen werden auf deinem Server gespeichert.</span>
-                <button id="save" class="button button-dark" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h12l2 2v14H5V4Z"/><path d="M8 4v6h8V4M8 20v-6h8v6"/></svg>Einstellungen speichern</button>
+                <span>Changes are stored on your server.</span>
+                <button id="save" class="button button-dark" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h12l2 2v14H5V4Z"/><path d="M8 4v6h8V4M8 20v-6h8v6"/></svg>Save settings</button>
               </div>
             </div>
           </section>
@@ -159,30 +172,30 @@
           <section class="card now-card">
             <div class="live-heading"><span><i></i> LIVE-STATUS</span><small id="last-event">–</small></div>
             <div class="now-illustration"><div class="live-logo"><img src="/app-icon.png" alt=""></div><div class="signal-wave wave-a"></div><div class="signal-wave wave-b"></div></div>
-            <h3>Alles im Blick.</h3>
-            <p>PostPush wartet auf das nächste Briefkasten-Ereignis von Home Assistant.</p>
-            <div class="last-event"><span class="event-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="m5 7 7 6 7-6"/></svg></span><span><small>Letztes Ergebnis</small><strong id="last-outcome">Noch kein Ereignis</strong></span></div>
+            <h3>Everything at a glance.</h3>
+            <p>PostPush is waiting for the next mailbox event from Home Assistant.</p>
+            <div class="last-event"><span class="event-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="m5 7 7 6 7-6"/></svg></span><span><small>Last result</small><strong id="last-outcome">No event yet</strong></span></div>
           </section>
 
           <section class="card activity-card">
-            <div class="aside-heading"><h3>Systemdetails</h3><span class="detail-dot"></span></div>
+            <div class="aside-heading"><h3>System details</h3><span class="detail-dot"></span></div>
             <dl>
-              <div><dt><span class="detail-icon purple"><svg viewBox="0 0 24 24"><path d="M6 19V5M6 8h8a4 4 0 0 1 0 8H6"/></svg></span>Letzte Wiedergabe</dt><dd id="last-playback">–</dd></div>
-              <div><dt><span class="detail-icon orange"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg></span>Letzte MQTT-Nachricht</dt><dd id="last-mqtt">–</dd></div>
-              <div><dt><span class="detail-icon green"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>HomePods</dt><dd id="output-count">0 gefunden</dd></div>
-              <div><dt><span class="detail-icon blue"><svg viewBox="0 0 24 24"><path d="M4 12h16M12 4v16"/></svg></span>MQTT-Topic</dt><dd id="mqtt-topic">–</dd></div>
-              <div><dt><span class="detail-icon red"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 17h.01"/></svg></span>Letzter Fehler</dt><dd id="last-error">–</dd></div>
+              <div><dt><span class="detail-icon purple"><svg viewBox="0 0 24 24"><path d="M6 19V5M6 8h8a4 4 0 0 1 0 8H6"/></svg></span>Last playback</dt><dd id="last-playback">–</dd></div>
+              <div><dt><span class="detail-icon orange"><svg viewBox="0 0 24 24"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg></span>Last MQTT message</dt><dd id="last-mqtt">–</dd></div>
+              <div><dt><span class="detail-icon green"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span>HomePods</dt><dd id="output-count">0 found</dd></div>
+              <div><dt><span class="detail-icon blue"><svg viewBox="0 0 24 24"><path d="M4 12h16M12 4v16"/></svg></span>MQTT topic</dt><dd id="mqtt-topic">–</dd></div>
+              <div><dt><span class="detail-icon red"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 17h.01"/></svg></span>Last error</dt><dd id="last-error">–</dd></div>
             </dl>
           </section>
 
           <section class="support-card">
             <span class="support-icon"><svg viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0-9-9v5a2 2 0 0 0 2 2h2v-7H3M21 12v5a2 2 0 0 1-2 2h-2v-7h4M12 21h3"/></svg></span>
-            <span><strong>Brauchst du Hilfe?</strong><small>Prüfe MQTT, AirPlay-Freigabe und den Zeitplan.</small></span>
+            <span><strong>Need help?</strong><small>Check MQTT, AirPlay access, and the schedule.</small></span>
           </section>
         </aside>
       </main>
 
-      <footer><span>PostPush</span><span>Private Smart-Home-Bridge · lokal betrieben</span></footer>
+      <footer><span>PostPush</span><span>Private smart-home bridge · hosted locally</span></footer>
     </div>
   </body>
 </html>

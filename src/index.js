@@ -52,12 +52,12 @@ function errorMessage(error) {
 
 function outcomeText(reason) {
   return {
-    accepted: "Ansage abgespielt",
-    cooldown: "In der Sperrzeit ignoriert",
-    disabled: "Hauptschalter ist aus",
-    "quiet-hours": "Während der Ruhezeit ignoriert",
-    invalid: "Ungültiges MQTT-Ereignis ignoriert",
-    retained: "Gespeichertes MQTT-Ereignis ignoriert",
+    accepted: "Announcement played",
+    cooldown: "Ignored during cooldown",
+    disabled: "Master switch is off",
+    "quiet-hours": "Ignored during quiet hours",
+    invalid: "Invalid MQTT event ignored",
+    retained: "Retained MQTT event ignored",
   }[reason] ?? reason;
 }
 
@@ -100,24 +100,24 @@ async function getOwnToneOutputs() {
 }
 
 async function playAnnouncement() {
-  if (state.playbackActive) throw new Error("Eine Ansage läuft bereits.");
+  if (state.playbackActive) throw new Error("An announcement is already playing.");
   state.playbackActive = true;
   try {
     if (settings.audioMode === "tts") await ensureAnnouncement();
     const activeFilename =
       settings.audioMode === "upload" ? settings.customAudioFilename : ANNOUNCEMENT_FILENAME;
-    if (!activeFilename) throw new Error("Noch keine eigene Audiodatei hochgeladen.");
+    if (!activeFilename) throw new Error("No custom audio file has been uploaded yet.");
     const activeFile = path.join(MEDIA_DIR, path.basename(activeFilename));
-    if (!fs.existsSync(activeFile)) throw new Error("Die ausgewählte Audiodatei wurde nicht gefunden.");
+    if (!fs.existsSync(activeFile)) throw new Error("The selected audio file could not be found.");
     const outputs = await getOwnToneOutputs();
     const outputIds = selectOutputIds(outputs, settings);
     if (!outputIds.length) {
-      throw new Error("Keine ausgewählten, erreichbaren HomePods gefunden.");
+      throw new Error("No selected, reachable HomePods were found.");
     }
     const track = await ownTone.findTrack(activeFilename);
     await ownTone.playTrack(track, outputIds, settings.volume);
     state.lastPlaybackAt = new Date().toISOString();
-    console.log(`Post-Ansage auf ${outputIds.length} AirPlay-Ausgang/Ausgängen gestartet.`);
+    console.log(`Mailbox announcement started on ${outputIds.length} AirPlay output(s).`);
     const playbackTime = Math.min(Math.max(Number(track.length_ms) || 4000, 1000), 30000);
     await new Promise((resolve) => setTimeout(resolve, playbackTime + 500));
   } finally {
@@ -134,7 +134,7 @@ async function handleMailEvent(source, { bypassGuards = false } = {}) {
   }
   if (!decision.accepted) {
     state.lastEventOutcome = outcomeText(decision.reason);
-    console.log(`Post-Ereignis (${source}) ${state.lastEventOutcome.toLowerCase()}.`);
+    console.log(`Mailbox event (${source}) ${state.lastEventOutcome.toLowerCase()}.`);
     return decision;
   }
 
@@ -146,8 +146,8 @@ async function handleMailEvent(source, { bypassGuards = false } = {}) {
     return decision;
   } catch (error) {
     state.lastError = errorMessage(error);
-    state.lastEventOutcome = "Ansage fehlgeschlagen";
-    console.error("Post-Ansage konnte nicht abgespielt werden:", error);
+    state.lastEventOutcome = "Announcement failed";
+    console.error("Mailbox announcement could not be played:", error);
     return { accepted: false, reason: "playback-error", error: state.lastError };
   }
 }
@@ -166,10 +166,10 @@ mqttClient.on("connect", () => {
   state.lastError = null;
   mqttClient.subscribe(MQTT_TOPIC, { qos: 0 }, (error) => {
     if (error) {
-      state.lastError = `MQTT-Topic konnte nicht abonniert werden: ${errorMessage(error)}`;
+      state.lastError = `Could not subscribe to the MQTT topic: ${errorMessage(error)}`;
       return;
     }
-    console.log(`MQTT verbunden. Warte auf "${MQTT_TOPIC}".`);
+    console.log(`MQTT connected. Waiting for "${MQTT_TOPIC}".`);
   });
 });
 mqttClient.on("reconnect", () => {
@@ -231,10 +231,10 @@ app.put("/api/settings", async (req, res) => {
     customAudioOriginalName: settings.customAudioOriginalName,
   });
   if (!candidate.useAllOutputs && !candidate.selectedOutputIds.length) {
-    return res.status(400).json({ error: "Wähle mindestens einen HomePod aus." });
+    return res.status(400).json({ error: "Select at least one HomePod." });
   }
   if (candidate.audioMode === "upload" && !candidate.customAudioFilename) {
-    return res.status(400).json({ error: "Lade zuerst eine eigene Audiodatei hoch." });
+    return res.status(400).json({ error: "Upload a custom audio file first." });
   }
   const textChanged = candidate.announcementText !== settings.announcementText;
   try {
@@ -253,7 +253,7 @@ app.put("/api/settings", async (req, res) => {
     return res.json({
       ok: true,
       settings,
-      warning: "Einstellungen gespeichert, aber OwnTone ist gerade nicht erreichbar.",
+      warning: "Settings were saved, but OwnTone is currently unavailable.",
     });
   }
 });
@@ -264,10 +264,10 @@ app.get("/api/announcement", (_req, res) => {
 });
 
 app.post("/api/custom-audio", upload.single("audio"), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: "Keine Audiodatei empfangen." });
+  if (!req.file) return res.status(400).json({ error: "No audio file received." });
   const extension = path.extname(req.file.originalname).slice(1).toLowerCase();
   if (!ALLOWED_EXTENSIONS.has(extension)) {
-    return res.status(415).json({ error: "Erlaubt sind MP3, WAV, M4A, AAC, FLAC und OGG." });
+    return res.status(415).json({ error: "Allowed formats are MP3, WAV, M4A, AAC, FLAC, and OGG." });
   }
 
   const filename = `postpush-custom-${Date.now()}.${extension}`;
@@ -315,7 +315,7 @@ app.get("/api/custom-audio", (_req, res) => {
 app.post("/api/outputs/:id/pair", async (req, res) => {
   const pin = String(req.body?.pin ?? "").trim();
   if (!/^\d{4}$/.test(pin)) {
-    return res.status(400).json({ error: "Die PIN muss vierstellig sein." });
+    return res.status(400).json({ error: "The PIN must contain four digits." });
   }
   try {
     await ownTone.pairOutput(req.params.id, pin);
@@ -328,7 +328,7 @@ app.post("/api/outputs/:id/pair", async (req, res) => {
 app.post("/api/test-announcement", async (_req, res) => {
   const result = await handleMailEvent("web-test", { bypassGuards: true });
   if (!result.accepted) {
-    return res.status(502).json({ error: result.error || "Testansage fehlgeschlagen." });
+    return res.status(502).json({ error: result.error || "Test announcement failed." });
   }
   return res.json({ ok: true, completedAt: new Date().toISOString() });
 });
@@ -339,28 +339,28 @@ app.get("/health", (_req, res) => {
 
 app.use((error, _req, res, _next) => {
   if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE") {
-    return res.status(413).json({ error: "Die Audiodatei darf höchstens 25 MB groß sein." });
+    return res.status(413).json({ error: "The audio file must not exceed 25 MB." });
   }
-  console.error("Unbehandelter Webfehler:", error);
+  console.error("Unhandled web error:", error);
   return res.status(500).json({ error: errorMessage(error) });
 });
 
 const webServer = app.listen(WEB_PORT, "0.0.0.0", (error) => {
   if (error) {
-    state.lastError = `Webserver konnte nicht gestartet werden: ${errorMessage(error)}`;
+    state.lastError = `Could not start the web server: ${errorMessage(error)}`;
     process.exitCode = 1;
     return;
   }
-  console.log(`PostPush-Weboberfläche läuft auf Port ${WEB_PORT}.`);
+  console.log(`PostPush web interface is running on port ${WEB_PORT}.`);
 });
 
 void ensureAnnouncement().catch((error) => {
   state.lastError = errorMessage(error);
-  console.error("Initiale Ansage konnte nicht erzeugt werden:", error);
+  console.error("Could not generate the initial announcement:", error);
 });
 
 function shutdown(signal) {
-  console.log(`${signal} empfangen, PostPush wird beendet.`);
+  console.log(`${signal} received; PostPush is shutting down.`);
   mqttClient.end(true);
   webServer.close(() => process.exit(0));
   setTimeout(() => process.exit(0), 2000).unref();

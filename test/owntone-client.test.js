@@ -140,6 +140,6 @@ test("output preparation fails when OwnTone never activates the requested speake
 
   await assert.rejects(
     client.prepareOutputs(["office"], 70),
-    /konnte die ausgewählten HomePods nicht aktivieren/
+    /could not activate the selected HomePods/
   );
 });

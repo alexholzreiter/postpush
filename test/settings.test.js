@@ -41,7 +41,7 @@ test("normalizeSettings validates all user-controlled values", () => {
 test("settings store persists normalized settings atomically", () => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "postpush-settings-"));
   const store = createSettingsStore(directory);
-  assert.equal(store.read().announcementText, "Du hast Post bekommen.");
+  assert.equal(store.read().announcementText, "You have mail.");
   store.write({ volume: 77, announcementText: "Post!" });
   assert.equal(store.read().volume, 77);
   assert.equal(store.read().announcementText, "Post!");

@@ -1,17 +1,53 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="260" viewBox="0 0 1200 260" role="img" aria-labelledby="title desc">
-  <title id="title">PostPush event flow</title>
-  <desc id="desc">Mailbox sensor to Home Assistant to MQTT to PostPush to HomePods</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">How PostPush works</title>
+  <desc id="desc">A mailbox sensor triggers PostPush, which plays an announcement on selected HomePods.</desc>
   <defs>
-    <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff7950"/><stop offset="1" stop-color="#ea4825"/></linearGradient>
-    <filter id="shadow"><feDropShadow dx="0" dy="12" stdDeviation="12" flood-opacity=".12"/></filter>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#181923"/><stop offset="1" stop-color="#222432"/></linearGradient>
+    <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ff754b"/><stop offset="1" stop-color="#ef4625"/></linearGradient>
+    <linearGradient id="mailbox" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4b5262"/><stop offset="1" stop-color="#20242e"/></linearGradient>
+    <linearGradient id="pod" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f1efe9"/><stop offset="1" stop-color="#a9a6a1"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="14" stdDeviation="12" flood-color="#000" flood-opacity=".28"/></filter>
   </defs>
-  <rect width="1200" height="260" rx="28" fill="#f8f7f3"/>
-  <g font-family="Arial" text-anchor="middle">
-    <g transform="translate(35 38)" filter="url(#shadow)"><rect width="190" height="184" rx="22" fill="#fff" stroke="#e9e5dc"/><circle cx="95" cy="66" r="35" fill="#fff0e9"/><path d="M71 59h48v34H71zM95 59a24 24 0 0 1 24 24H71a24 24 0 0 1 24-24Z" fill="#343a49"/><path d="M79 49v35M79 49h21" stroke="#f15a35" stroke-width="7" stroke-linecap="round"/><text x="95" y="135" fill="#24252d" font-size="16" font-weight="750">Mailbox sensor</text><text x="95" y="158" fill="#96949b" font-size="11">motion detected</text></g>
-    <g transform="translate(275 38)" filter="url(#shadow)"><rect width="190" height="184" rx="22" fill="#fff" stroke="#e9e5dc"/><circle cx="95" cy="66" r="35" fill="#eaf4ff"/><path d="M76 81V58l19-13 19 13v23M87 81V68h16v13" fill="none" stroke="#3984dd" stroke-width="4" stroke-linejoin="round"/><text x="95" y="135" fill="#24252d" font-size="16" font-weight="750">Home Assistant</text><text x="95" y="158" fill="#96949b" font-size="11">automation publishes</text></g>
-    <g transform="translate(515 38)" filter="url(#shadow)"><rect width="190" height="184" rx="22" fill="#fff" stroke="#e9e5dc"/><circle cx="95" cy="66" r="35" fill="#eef8f3"/><path d="M73 76q22-30 44 0M80 81q15-19 30 0M91 85h8" fill="none" stroke="#2aae78" stroke-width="4" stroke-linecap="round"/><text x="95" y="135" fill="#24252d" font-size="16" font-weight="750">MQTT</text><text x="95" y="158" fill="#96949b" font-size="11">non-retained event</text></g>
-    <g transform="translate(755 38)" filter="url(#shadow)"><rect width="190" height="184" rx="22" fill="#fff" stroke="#e9e5dc"/><image href="postpush-icon.png" x="60" y="31" width="70" height="70"/><text x="95" y="135" fill="#24252d" font-size="16" font-weight="750">PostPush</text><text x="95" y="158" fill="#96949b" font-size="11">speech or custom audio</text></g>
-    <g transform="translate(995 38)" filter="url(#shadow)"><rect width="170" height="184" rx="22" fill="#fff" stroke="#e9e5dc"/><circle cx="85" cy="66" r="35" fill="#f0edff"/><path d="M65 82a20 20 0 0 1 40 0v9H65Z" fill="#7561e8"/><path d="M111 59q12 10 0 20M119 53q22 16 0 32" fill="none" stroke="#7561e8" stroke-width="3" stroke-linecap="round"/><text x="85" y="135" fill="#24252d" font-size="16" font-weight="750">HomePods</text><text x="85" y="158" fill="#96949b" font-size="11">AirPlay 2 playback</text></g>
-    <g fill="#b2afa7" font-size="27" font-weight="700"><text x="250" y="139">›</text><text x="490" y="139">›</text><text x="730" y="139">›</text><text x="970" y="139">›</text></g>
+  <rect width="1200" height="360" rx="32" fill="url(#panel)"/>
+  <g font-family="Arial, sans-serif">
+    <g transform="translate(44 35)">
+      <rect width="326" height="290" rx="25" fill="#fff" fill-opacity=".035" stroke="#fff" stroke-opacity=".09"/>
+      <text x="25" y="32" fill="#6b6b77" font-size="11" font-weight="800" letter-spacing="1.5">01 · DETECT</text>
+      <g transform="translate(90 74)" filter="url(#shadow)">
+        <path d="M13 79V51C13 23 36 0 64 0h45c28 0 51 23 51 51v65H32c-10 0-19-9-19-19Z" fill="url(#mailbox)" stroke="#707684" stroke-width="3"/>
+        <path d="M37 20v73M37 20h43" fill="none" stroke="url(#orange)" stroke-width="12" stroke-linecap="round"/><circle cx="37" cy="90" r="4" fill="#ffe6de"/>
+        <path d="M44 116h101l31 27H72z" fill="#343947" stroke="#777d8b" stroke-width="4"/>
+        <rect x="89" y="59" width="52" height="60" rx="5" fill="#e6bd78" transform="rotate(-6 115 89)"/>
+        <path d="M76 76h67v48H76z" fill="#fff" transform="rotate(4 110 100)"/><path d="m76 76 34 26 33-26" fill="#f0f1f4" stroke="#d9dae0" stroke-width="2" transform="rotate(4 110 100)"/>
+      </g>
+      <text x="163" y="235" text-anchor="middle" fill="#fff" font-size="19" font-weight="750">The sensor detects mail</text>
+      <text x="163" y="260" text-anchor="middle" fill="#9695a0" font-size="12">Home Assistant publishes an MQTT event.</text>
+    </g>
+    <g transform="translate(383 166)" fill="none" stroke="#ff6d45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M0 14h45"/><path d="m34 3 11 11-11 11"/></g>
+    <g transform="translate(437 35)">
+      <rect width="326" height="290" rx="25" fill="#fff" fill-opacity=".035" stroke="#fff" stroke-opacity=".09"/>
+      <text x="25" y="32" fill="#6b6b77" font-size="11" font-weight="800" letter-spacing="1.5">02 · PREPARE</text>
+      <g transform="translate(111 63)">
+        <circle cx="52" cy="64" r="74" fill="none" stroke="#ff6d45" stroke-opacity=".10"/><circle cx="52" cy="64" r="58" fill="none" stroke="#ff6d45" stroke-opacity=".18"/>
+        <rect x="0" y="12" width="104" height="104" rx="31" fill="url(#orange)" filter="url(#shadow)"/>
+        <path d="M20 66c0-15 12-28 28-28h17c12 0 21 10 21 22v31H46c-15 0-26-11-26-25Z" fill="#fff"/>
+        <path d="M35 33v49M35 33h27" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"/><path d="M72 63q12 11 0 22M83 54q22 20 0 40" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+      </g>
+      <text x="163" y="235" text-anchor="middle" fill="#fff" font-size="19" font-weight="750">PostPush prepares the message</text>
+      <text x="163" y="260" text-anchor="middle" fill="#9695a0" font-size="12">Schedule, cooldown, speech or custom audio.</text>
+    </g>
+    <g transform="translate(776 166)" fill="none" stroke="#ff6d45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M0 14h45"/><path d="m34 3 11 11-11 11"/></g>
+    <g transform="translate(830 35)">
+      <rect width="326" height="290" rx="25" fill="#fff" fill-opacity=".035" stroke="#fff" stroke-opacity=".09"/>
+      <text x="25" y="32" fill="#6b6b77" font-size="11" font-weight="800" letter-spacing="1.5">03 · PLAY</text>
+      <g transform="translate(82 78)" filter="url(#shadow)">
+        <g transform="translate(0 29)"><path d="M0 34a34 34 0 0 1 68 0v45H0Z" fill="url(#pod)"/><ellipse cx="34" cy="78" rx="23" ry="4" fill="#777" opacity=".35"/></g>
+        <g transform="translate(52 0)"><path d="M0 44a44 44 0 0 1 88 0v60H0Z" fill="url(#pod)"/><ellipse cx="44" cy="103" rx="30" ry="5" fill="#777" opacity=".35"/></g>
+        <g transform="translate(120 34)"><path d="M0 31a31 31 0 0 1 62 0v42H0Z" fill="url(#pod)"/><ellipse cx="31" cy="72" rx="21" ry="4" fill="#777" opacity=".35"/></g>
+        <g transform="translate(177 28)" fill="none" stroke="#ff6d45" stroke-width="6" stroke-linecap="round"><path d="M0 25q20 20 0 40"/><path d="M14 12q35 33 0 66" opacity=".72"/></g>
+      </g>
+      <text x="163" y="235" text-anchor="middle" fill="#fff" font-size="19" font-weight="750">OwnTone plays in sync</text>
+      <text x="163" y="260" text-anchor="middle" fill="#9695a0" font-size="12">Selected HomePods announce it together.</text>
+    </g>
   </g>
 </svg>

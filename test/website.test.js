@@ -5,11 +5,12 @@ import { test } from "node:test";
 const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 test("marketing website has the expected domain and GitHub Pages workflow", async () => {
-  const [html, cname, workflow, sitemap] = await Promise.all([
+  const [html, cname, workflow, sitemap, googleVerification] = await Promise.all([
     read("website/index.html"),
     read("website/CNAME"),
     read(".github/workflows/pages.yml"),
     read("website/sitemap.xml"),
+    read("website/google7afa0469d038fe76.html"),
   ]);
 
   assert.equal(cname.trim(), "postpush.klickwerk.digital");
@@ -20,6 +21,7 @@ test("marketing website has the expected domain and GitHub Pages workflow", asyn
   assert.match(workflow, /actions\/deploy-pages@v4/);
   assert.match(workflow, /path: website/);
   assert.match(workflow, /include-hidden-files: true/);
+  assert.equal(googleVerification.trim(), "google-site-verification: google7afa0469d038fe76.html");
 });
 
 test("website exposes GitHub, Runtipi, Docker, and coffee support actions", async () => {
@@ -50,15 +52,23 @@ test("website references only existing local visual assets", async () => {
   }
 });
 
-test("website uses the PostPush icon for branding, favicons and social previews", async () => {
-  const [home, about] = await Promise.all([read("website/index.html"), read("website/about/index.html")]);
+test("website uses PostPush branding, favicons and a dedicated social preview", async () => {
+  const [home, about, shareImage] = await Promise.all([
+    read("website/index.html"),
+    read("website/about/index.html"),
+    readFile(new URL("../website/assets/postpush-share.png", import.meta.url)),
+  ]);
   assert.match(home, /assets\/postpush-icon\.png/);
   assert.match(home, /assets\/favicon\.ico/);
   assert.match(home, /assets\/favicon-32\.png/);
   assert.match(home, /assets\/apple-touch-icon\.png/);
-  assert.match(home, /property="og:image" content="https:\/\/postpush\.klickwerk\.digital\/assets\/postpush-icon\.png"/);
-  assert.match(home, /name="twitter:image" content="https:\/\/postpush\.klickwerk\.digital\/assets\/postpush-icon\.png"/);
+  assert.match(home, /property="og:image" content="https:\/\/postpush\.klickwerk\.digital\/assets\/postpush-share\.png"/);
+  assert.match(home, /name="twitter:card" content="summary_large_image"/);
+  assert.match(home, /name="twitter:image" content="https:\/\/postpush\.klickwerk\.digital\/assets\/postpush-share\.png"/);
   assert.match(about, /assets\/postpush-icon\.png/);
+  assert.match(about, /property="og:image" content="https:\/\/postpush\.klickwerk\.digital\/assets\/postpush-share\.png"/);
+  assert.equal(shareImage.readUInt32BE(16), 1200);
+  assert.equal(shareImage.readUInt32BE(20), 630);
 });
 
 test("structured data matches visible PostPush FAQs and the package version", async () => {
@@ -105,14 +115,27 @@ test("AI discovery, feed, about page, and README remain consistent", async () =>
   assert.match(readme, /Tip%20a%20coffee/);
 });
 
+test("GitHub artwork is self-contained and uses the website mailbox flow", async () => {
+  const [hero, flow] = await Promise.all([
+    read("docs/postpush-hero.svg"),
+    read("docs/postpush-flow.svg"),
+  ]);
+  assert.doesNotMatch(hero, /<image\b/);
+  assert.doesNotMatch(flow, /<image\b/);
+  assert.match(hero, /Same clean mailbox silhouette used on the project website/);
+  assert.match(flow, /The sensor detects mail/);
+  assert.match(flow, /PostPush prepares the message/);
+  assert.match(flow, /OwnTone plays in sync/);
+});
+
 test("public Runtipi metadata is written in English", async () => {
   const [configSource, description] = await Promise.all([
     read("apps/postpush/config.json"),
     read("apps/postpush/metadata/description.md"),
   ]);
   const config = JSON.parse(configSource);
-  assert.equal(config.version, "0.2.11");
-  assert.equal(config.tipi_version, 12);
+  assert.equal(config.version, "0.2.12");
+  assert.equal(config.tipi_version, 13);
   assert.equal(config.form_fields[0].label, "MQTT broker");
   assert.match(description, /PostPush announces new mail/);
   assert.doesNotMatch(description, /PostPush meldet/);

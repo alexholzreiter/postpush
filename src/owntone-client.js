@@ -67,7 +67,7 @@ export class OwnToneClient {
       if (track) return track;
       if (attempt < attempts - 1) await sleep(250);
     }
-    throw new Error("OwnTone hat die Ansage noch nicht indexiert.");
+    throw new Error("OwnTone has not indexed the announcement yet.");
   }
 
   async setOutputs(outputIds) {
@@ -131,7 +131,7 @@ export class OwnToneClient {
       if (attempt < attempts - 1) await sleep(this.activationPollDelayMs);
     }
     throw new Error(
-      "OwnTone konnte die ausgewählten HomePods nicht aktivieren. Prüfe in Apple Home unter „Lautsprecher & TV“, ob Geräte im selben Netzwerk zugreifen dürfen."
+      "OwnTone could not activate the selected HomePods. In Apple Home, check whether devices on the same network are allowed to access the speakers."
     );
   }
 
@@ -144,13 +144,13 @@ export class OwnToneClient {
     const availableIds = new Set(outputs.map((output) => String(output.id)));
     const missingIds = outputIds.filter((id) => !availableIds.has(String(id)));
     if (missingIds.length) {
-      throw new Error(`Nicht erreichbare AirPlay-Ausgänge: ${missingIds.join(", ")}`);
+      throw new Error(`Unavailable AirPlay outputs: ${missingIds.join(", ")}`);
     }
     await this.prepareOutputs(outputIds, volume);
     await this.request("/api/queue/clear", { method: "PUT" });
     const query = new URLSearchParams({ playback: "start", shuffle: "false", uris: track.uri });
     const queued = await this.request(`/api/queue/items/add?${query}`, { method: "POST" });
-    if (!queued?.count) throw new Error("OwnTone hat die Audiodatei nicht in die Warteschlange gelegt.");
+    if (!queued?.count) throw new Error("OwnTone did not add the audio file to the queue.");
     return queued;
   }
 }

@@ -5,7 +5,7 @@ export function synthesizeSpeech(text, destination, options = {}) {
   const command = options.command ?? process.env.PIPER_COMMAND ?? "piper";
   const model = options.model ?? process.env.PIPER_MODEL;
   const timeoutMs = options.timeoutMs ?? 60000;
-  if (!model) return Promise.reject(new Error("PIPER_MODEL ist nicht konfiguriert."));
+  if (!model) return Promise.reject(new Error("PIPER_MODEL is not configured."));
 
   const temporary = `${destination}.tmp.wav`;
   fs.rmSync(temporary, { force: true });
@@ -30,7 +30,7 @@ export function synthesizeSpeech(text, destination, options = {}) {
         fs.rmSync(temporary, { force: true });
         reject(
           new Error(
-            `Spracherzeugung fehlgeschlagen (${signal || `Code ${code}`}): ${stderr.trim()}`
+            `Speech generation failed (${signal || `code ${code}`}): ${stderr.trim()}`
           )
         );
         return;

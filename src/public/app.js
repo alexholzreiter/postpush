@@ -48,7 +48,7 @@ let lastKnownOutputs = [];
 
 function formatDate(value) {
   return value
-    ? new Intl.DateTimeFormat("de-AT", { dateStyle: "short", timeStyle: "medium" }).format(
+    ? new Intl.DateTimeFormat("en-GB", { dateStyle: "short", timeStyle: "medium" }).format(
         new Date(value)
       )
     : "–";
@@ -99,7 +99,7 @@ function renderOutputs(outputs, settings) {
   if (!outputs.length) {
     const empty = document.createElement("p");
     empty.className = "empty";
-    empty.textContent = "Noch keine HomePods gefunden. Prüfe Netzwerk und AirPlay-Freigabe.";
+    empty.textContent = "No HomePods found yet. Check the network and AirPlay access.";
     elements.outputs.append(empty);
     return;
   }
@@ -113,9 +113,9 @@ function renderOutputs(outputs, settings) {
     const copy = document.createElement("span");
     copy.className = "output-copy";
     const name = document.createElement("strong");
-    name.textContent = output.name || "AirPlay-Lautsprecher";
+    name.textContent = output.name || "AirPlay speaker";
     const detail = document.createElement("small");
-    detail.textContent = requiresApproval ? "AirPlay-PIN erforderlich" : `Aktuelle Lautstärke ${output.volume ?? "–"} %`;
+    detail.textContent = requiresApproval ? "AirPlay PIN required" : `Current volume ${output.volume ?? "–"} %`;
     copy.append(name, detail);
     const check = document.createElement("span");
     check.className = "check";
@@ -152,15 +152,15 @@ function applyForm(settings) {
 function renderStatus(data) {
   const outputs = data.outputs.length ? data.outputs : lastKnownOutputs;
   if (data.outputs.length) lastKnownOutputs = data.outputs;
-  setStatus(elements.mqttDot, elements.mqttStatus, data.mqttConnected, "Verbunden", "Nicht verbunden");
-  setStatus(elements.airplayDot, elements.airplayStatus, data.ownToneConnected, `${outputs.length} gefunden`, "Nicht erreichbar");
+  setStatus(elements.mqttDot, elements.mqttStatus, data.mqttConnected, "Connected", "Disconnected");
+  setStatus(elements.airplayDot, elements.airplayStatus, data.ownToneConnected, `${outputs.length} found`, "Unavailable");
   const activeAudioReady =
     data.settings.audioMode === "upload" ? Boolean(data.customAudioUrl) : data.ttsReady;
   const audioLabel =
     data.settings.audioMode === "upload"
-      ? data.settings.customAudioOriginalName || "Eigene Datei"
-      : "Lokale Stimme bereit";
-  setStatus(elements.ttsDot, elements.ttsStatus, activeAudioReady, audioLabel, "Wird vorbereitet");
+      ? data.settings.customAudioOriginalName || "Custom file"
+      : "Local voice ready";
+  setStatus(elements.ttsDot, elements.ttsStatus, activeAudioReady, audioLabel, "Preparing");
   elements.currentAudio.classList.toggle("hidden", !data.customAudioUrl);
   elements.currentAudioName.textContent = data.settings.customAudioOriginalName || "–";
   if (data.customAudioUrl) {
@@ -168,12 +168,12 @@ function renderStatus(data) {
     if (!elements.customAudioPlayer.src.endsWith(nextSource)) elements.customAudioPlayer.src = nextSource;
   }
   elements.lastEvent.textContent = formatDate(data.lastEventAt);
-  elements.lastOutcome.textContent = data.lastEventOutcome || "Noch kein Ereignis";
+  elements.lastOutcome.textContent = data.lastEventOutcome || "No event yet";
   elements.lastPlayback.textContent = formatDate(data.lastPlaybackAt);
   elements.lastMqtt.textContent = formatDate(data.mqttLastMessageAt);
   elements.mqttTopic.textContent = data.mqttTopic;
   elements.mqttTopic.title = data.mqttTopic;
-  elements.outputCount.textContent = `${outputs.length} gefunden`;
+  elements.outputCount.textContent = `${outputs.length} found`;
   elements.lastError.textContent = data.lastError || "–";
   elements.lastError.title = data.lastError || "";
   if (!formDirty) applyForm(data.settings);
@@ -186,7 +186,7 @@ async function loadStatus({ quiet = false, forceForm = false } = {}) {
     if (forceForm) formDirty = false;
     renderStatus(data);
   } catch (error) {
-    if (!quiet) showNotice(`Status konnte nicht geladen werden: ${error.message}`);
+    if (!quiet) showNotice(`Could not load status: ${error.message}`);
   }
 }
 
@@ -205,7 +205,7 @@ elements.audioMode.forEach((input) => {
   });
 });
 elements.audioFile.addEventListener("change", () => {
-  elements.audioFileLabel.textContent = elements.audioFile.files[0]?.name || "Audiodatei auswählen";
+  elements.audioFileLabel.textContent = elements.audioFile.files[0]?.name || "Choose an audio file";
 });
 elements.volume.addEventListener("input", () => {
   markDirty();
@@ -231,32 +231,32 @@ elements.outputs.addEventListener("change", markDirty);
 elements.audioUploadForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!elements.audioFile.files.length) {
-    showNotice("Wähle zuerst eine Audiodatei aus.");
+    showNotice("Choose an audio file first.");
     return;
   }
   elements.uploadAudio.disabled = true;
-  elements.uploadAudio.textContent = "Wird hochgeladen …";
+  elements.uploadAudio.textContent = "Uploading …";
   try {
     const result = await api("/api/custom-audio", {
       method: "POST",
       body: new FormData(elements.audioUploadForm),
     });
     elements.audioUploadForm.reset();
-    elements.audioFileLabel.textContent = "Audiodatei auswählen";
+    elements.audioFileLabel.textContent = "Choose an audio file";
     formDirty = false;
-    showNotice(`„${result.originalName}“ wurde hochgeladen und ausgewählt.`, true);
+    showNotice(`“${result.originalName}” was uploaded and selected.`, true);
     await loadStatus({ quiet: true, forceForm: true });
   } catch (error) {
     showNotice(error.message);
   } finally {
     elements.uploadAudio.disabled = false;
-    elements.uploadAudio.textContent = "Datei hochladen";
+    elements.uploadAudio.textContent = "Upload file";
   }
 });
 
 elements.save.addEventListener("click", async () => {
   elements.save.disabled = true;
-  elements.save.textContent = "Ansage wird vorbereitet …";
+  elements.save.textContent = "Preparing announcement …";
   try {
     const result = await api("/api/settings", {
       method: "PUT",
@@ -275,13 +275,13 @@ elements.save.addEventListener("click", async () => {
       }),
     });
     formDirty = false;
-    showNotice(result.warning || "Einstellungen und Ansage wurden gespeichert.", true);
+    showNotice(result.warning || "Settings and announcement saved.", true);
     await loadStatus({ quiet: true, forceForm: true });
   } catch (error) {
     showNotice(error.message);
   } finally {
     elements.save.disabled = false;
-    elements.save.textContent = "Einstellungen speichern";
+    elements.save.textContent = "Save settings";
   }
 });
 
@@ -289,7 +289,7 @@ elements.test.addEventListener("click", async () => {
   elements.test.disabled = true;
   try {
     await api("/api/test-announcement", { method: "POST" });
-    showNotice("Testansage wurde abgespielt.", true);
+    showNotice("Test announcement played.", true);
     await loadStatus({ quiet: true });
   } catch (error) {
     showNotice(error.message);

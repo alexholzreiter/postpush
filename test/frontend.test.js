@@ -48,3 +48,27 @@ test("DoorBell visual language includes the PostPush mailbox hero", () => {
   assert.match(css, /min-height: 530px/);
   assert.match(css, /border-radius: 38px/);
 });
+
+test("local interface is English and the live icon has no white matte", () => {
+  const html = fs.readFileSync(path.join(root, "src/public/index.html"), "utf8");
+  const script = fs.readFileSync(path.join(root, "src/public/app.js"), "utf8");
+  const css = fs.readFileSync(path.join(root, "src/public/styles.css"), "utf8");
+
+  assert.match(html, /<html lang="en">/);
+  assert.match(html, /Everything at a glance\./);
+  assert.match(html, /Save settings/);
+  assert.match(script, /Test announcement played\./);
+  assert.doesNotMatch(html, /Alles im Blick|Einstellungen speichern|Briefkasten|Wird geprüft|Lautstärke/);
+  assert.doesNotMatch(script, /Noch keine|Verbunden|Wird vorbereitet|gefunden|hochgeladen/);
+  assert.match(css, /\.live-logo \{[^}]*border: 0;[^}]*background: #f44a1b;/);
+});
+
+test("local interface ships a 1200 by 630 social share image", () => {
+  const html = fs.readFileSync(path.join(root, "src/public/index.html"), "utf8");
+  const shareImage = fs.readFileSync(path.join(root, "src/public/postpush-share.png"));
+
+  assert.match(html, /property="og:image" content="\/postpush-share\.png"/);
+  assert.match(html, /name="twitter:card" content="summary_large_image"/);
+  assert.equal(shareImage.readUInt32BE(16), 1200);
+  assert.equal(shareImage.readUInt32BE(20), 630);
+});
