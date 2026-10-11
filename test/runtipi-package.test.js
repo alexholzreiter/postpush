@@ -48,7 +48,7 @@ test("application, image and Runtipi versions stay synchronized", () => {
   const config = JSON.parse(fs.readFileSync(path.join(storeApp, "config.json"), "utf8"));
   const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
   assert.equal(config.version, version);
-  assert.equal(config.tipi_version, 5);
+  assert.equal(config.tipi_version, 6);
   assert.match(compose, new RegExp(`postpush:${version.replaceAll(".", "\\.")}`));
   assert.match(compose, /schema_version: 2/);
 });
@@ -63,20 +63,19 @@ test("Runtipi fields are valid and secrets use password input", () => {
   assert.equal(config.form_fields.find((field) => field.env_variable === "MQTT_PASSWORD").type, "password");
 });
 
-test("PostPush ports do not collide with the Ring reference app", () => {
+test("Runtipi package reuses the Ring app's OwnTone service without port conflicts", () => {
   const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
   assert.match(compose, /WEB_PORT: "8586"/);
-  assert.match(compose, /port = 3690/);
-  assert.doesNotMatch(compose, /port = 3689/);
+  assert.match(compose, /OWNTONE_URL: http:\/\/127\.0\.0\.1:3689/);
+  assert.match(compose, /doorbell\/ring-homepod-doorbell\/data\/media:\/data\/media/);
+  assert.doesNotMatch(compose, /^  owntone:/m);
 });
 
-test("OwnTone starts its required daemons without privileged OpenRC init", () => {
+test("Runtipi package does not start a second conflicting mDNS stack", () => {
   const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
-  assert.match(compose, /condition: service_started/);
-  assert.match(compose, /dbus-daemon --system --fork/);
-  assert.match(compose, /avahi-daemon --daemonize/);
-  assert.match(compose, /exec \/usr\/sbin\/owntone -f/);
+  assert.doesNotMatch(compose, /depends_on:/);
+  assert.doesNotMatch(compose, /avahi-daemon/);
+  assert.doesNotMatch(compose, /dbus-daemon/);
   assert.doesNotMatch(compose, /healthcheck:/);
   assert.doesNotMatch(compose, /privileged:/);
-  assert.doesNotMatch(compose, /exec \/sbin\/init/);
 });

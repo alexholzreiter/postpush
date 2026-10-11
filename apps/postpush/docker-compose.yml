@@ -3,15 +3,12 @@ services:
     image: ghcr.io/alexholzreiter/postpush:0.2.5
     restart: unless-stopped
     network_mode: host
-    depends_on:
-      owntone:
-        condition: service_started
     environment:
       TZ: ${TZ}
       DATA_DIR: /data
       MEDIA_DIR: /data/media
       WEB_PORT: "8586"
-      OWNTONE_URL: http://127.0.0.1:3690
+      OWNTONE_URL: http://127.0.0.1:3689
       OWNTONE_MEDIA_PATH: /srv/media
       MQTT_URL: ${MQTT_URL}
       MQTT_USERNAME: ${MQTT_USERNAME}
@@ -19,60 +16,9 @@ services:
       MQTT_TOPIC: ${MQTT_TOPIC}
     volumes:
       - ${APP_DATA_DIR}/data:/data
+      - ${APP_DATA_DIR}/../../doorbell/ring-homepod-doorbell/data/media:/data/media
     x-runtipi:
       is_main: true
       internal_port: 8586
-
-  owntone:
-    image: docker.io/owntone/owntone:29.3
-    restart: unless-stopped
-    network_mode: host
-    entrypoint:
-      - /bin/sh
-      - -c
-      - |
-        mkdir -p /data/media /data/owntone-cache /data/owntone-config
-        cat > /data/owntone-config/owntone.conf <<'OWNTONE_CONFIG'
-        general {
-          uid = "owntone"
-          logfile = "/dev/stdout"
-          loglevel = log
-          trusted_networks = { "localhost" }
-          ipv6 = no
-          cache_dir = "/var/cache/owntone"
-          speaker_autoselect = no
-          start_buffer_ms = 1000
-        }
-        library {
-          name = "PostPush"
-          port = 3690
-          directories = { "/srv/media" }
-        }
-        audio {
-          nickname = "Disabled"
-          type = "disabled"
-        }
-        mpd {
-          port = 0
-        }
-        OWNTONE_CONFIG
-        chmod 0644 /data/owntone-config/owntone.conf
-        chown -R 1000:1000 /data/media /data/owntone-cache /data/owntone-config
-        adduser -D -g owntone -h /dev/null -s /sbin/nologin owntone 2>/dev/null || true
-        usermod -u 1000 owntone 2>/dev/null || true
-        groupmod -g 1000 owntone 2>/dev/null || true
-        mkdir -p /run/dbus /run/avahi-daemon
-        dbus-uuidgen --ensure=/etc/machine-id
-        dbus-daemon --system --fork
-        avahi-daemon --daemonize
-        exec /usr/sbin/owntone -f
-    environment:
-      UID: "1000"
-      GID: "1000"
-    volumes:
-      - ${APP_DATA_DIR}/data:/data
-      - ${APP_DATA_DIR}/data/owntone-config:/etc/owntone:ro
-      - ${APP_DATA_DIR}/data/media:/srv/media
-      - ${APP_DATA_DIR}/data/owntone-cache:/var/cache/owntone
 x-runtipi:
   schema_version: 2
