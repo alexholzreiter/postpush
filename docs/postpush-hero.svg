@@ -14,15 +14,7 @@
   <circle cx="1110" cy="292" r="210" fill="none" stroke="#ff7450" stroke-opacity=".10" stroke-width="2"/>
   <circle cx="1110" cy="292" r="270" fill="none" stroke="#8f7cff" stroke-opacity=".08" stroke-width="2"/>
   <g transform="translate(92 105)">
-    <rect width="78" height="78" rx="23" fill="#fff"/>
-    <g transform="translate(12 17)">
-      <path d="M8 16h38v27H8z" fill="url(#mail)"/>
-      <path d="M27 16a19 19 0 0 1 19 19H8a19 19 0 0 1 19-19Z" fill="url(#mail)"/>
-      <path d="M14 43h27l8 6H18z" fill="#333847"/>
-      <path d="M14 12v26" stroke="url(#orange)" stroke-width="7" stroke-linecap="round"/>
-      <path d="M14 12h17" stroke="url(#orange)" stroke-width="7" stroke-linecap="round"/>
-      <path d="M50 20q8 7 0 14M55 15q15 12 0 24" fill="none" stroke="#ff6841" stroke-width="4" stroke-linecap="round"/>
-    </g>
+    <image href="postpush-icon.png" width="78" height="78"/>
     <text x="103" y="36" fill="#fff" font-family="Arial" font-size="27" font-weight="800">PostPush</text>
     <text x="103" y="61" fill="#898b97" font-family="Arial" font-size="15" font-weight="600" letter-spacing="1">MAILBOX × HOMEPOD</text>
   </g>

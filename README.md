@@ -1,4 +1,8 @@
 <p align="center">
+  <img src="docs/postpush-icon.png" alt="PostPush app icon" width="128" height="128">
+</p>
+
+<p align="center">
   <img src="docs/postpush-hero.svg" alt="PostPush — mailbox announcements on HomePods" width="100%">
 </p>
 

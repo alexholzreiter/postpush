@@ -43,12 +43,27 @@ test("web app ships the requested icon and favicon assets", () => {
   assert.match(page, /src="\/app-icon\.png"/);
 });
 
+test("the new PostPush icon is identical across the app, website and Runtipi", () => {
+  const canonicalIcon = fs.readFileSync(path.join(root, "docs", "postpush-icon.png"));
+  const exactIconCopies = [
+    path.join(root, "src", "public", "app-icon.png"),
+    path.join(root, "website", "assets", "postpush-icon.png"),
+    path.join(root, "website", "assets", "logo.png"),
+    path.join(storeApp, "metadata", "logo.png"),
+    path.join(standalone, "metadata", "logo.png"),
+  ];
+
+  for (const icon of exactIconCopies) {
+    assert.deepEqual(fs.readFileSync(icon), canonicalIcon, `${icon} does not use the canonical PostPush icon`);
+  }
+});
+
 test("application, image and Runtipi versions stay synchronized", () => {
   const version = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8")).version;
   const config = JSON.parse(fs.readFileSync(path.join(storeApp, "config.json"), "utf8"));
   const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
   assert.equal(config.version, version);
-  assert.equal(config.tipi_version, 10);
+  assert.equal(config.tipi_version, 11);
   assert.match(compose, new RegExp(`postpush:${version.replaceAll(".", "\\.")}`));
   assert.match(compose, /schema_version: 2/);
 });

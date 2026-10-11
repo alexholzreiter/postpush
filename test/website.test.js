@@ -50,6 +50,17 @@ test("website references only existing local visual assets", async () => {
   }
 });
 
+test("website uses the PostPush icon for branding, favicons and social previews", async () => {
+  const [home, about] = await Promise.all([read("website/index.html"), read("website/about/index.html")]);
+  assert.match(home, /assets\/postpush-icon\.png/);
+  assert.match(home, /assets\/favicon\.ico/);
+  assert.match(home, /assets\/favicon-32\.png/);
+  assert.match(home, /assets\/apple-touch-icon\.png/);
+  assert.match(home, /property="og:image" content="https:\/\/postpush\.klickwerk\.digital\/assets\/postpush-icon\.png"/);
+  assert.match(home, /name="twitter:image" content="https:\/\/postpush\.klickwerk\.digital\/assets\/postpush-icon\.png"/);
+  assert.match(about, /assets\/postpush-icon\.png/);
+});
+
 test("structured data matches visible PostPush FAQs and the package version", async () => {
   const [html, faqData, packageJson] = await Promise.all([
     read("website/index.html"),
@@ -100,8 +111,8 @@ test("public Runtipi metadata is written in English", async () => {
     read("apps/postpush/metadata/description.md"),
   ]);
   const config = JSON.parse(configSource);
-  assert.equal(config.version, "0.2.9");
-  assert.equal(config.tipi_version, 10);
+  assert.equal(config.version, "0.2.10");
+  assert.equal(config.tipi_version, 11);
   assert.equal(config.form_fields[0].label, "MQTT broker");
   assert.match(description, /PostPush announces new mail/);
   assert.doesNotMatch(description, /PostPush meldet/);

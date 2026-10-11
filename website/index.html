@@ -11,18 +11,19 @@
     <meta name="robots" content="index,follow">
     <link rel="canonical" href="https://postpush.klickwerk.digital/">
     <link rel="alternate" type="application/rss+xml" title="PostPush updates" href="https://postpush.klickwerk.digital/feed.xml">
-    <link rel="icon" href="assets/logo.png" type="image/png">
-    <link rel="apple-touch-icon" href="assets/logo.png">
+    <link rel="icon" href="assets/favicon.ico" sizes="any">
+    <link rel="icon" href="assets/favicon-32.png" type="image/png">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="PostPush">
     <meta property="og:title" content="PostPush — Mailbox announcements on HomePods">
     <meta property="og:description" content="A self-hosted MQTT-to-AirPlay bridge for spoken mailbox alerts and custom sounds.">
     <meta property="og:url" content="https://postpush.klickwerk.digital/">
-    <meta property="og:image" content="https://postpush.klickwerk.digital/assets/app-overview.png">
-    <meta name="twitter:card" content="summary_large_image">
+    <meta property="og:image" content="https://postpush.klickwerk.digital/assets/postpush-icon.png">
+    <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="PostPush — Mailbox announcements on HomePods">
     <meta name="twitter:description" content="New mail. Your announcement. Every room.">
-    <meta name="twitter:image" content="https://postpush.klickwerk.digital/assets/app-overview.png">
+    <meta name="twitter:image" content="https://postpush.klickwerk.digital/assets/postpush-icon.png">
     <link rel="stylesheet" href="styles.css">
     <script src="app.js" type="module"></script>
     <script type="application/ld+json">
@@ -67,7 +68,7 @@
             "@id": "https://postpush.klickwerk.digital/#brand",
             "name": "PostPush",
             "url": "https://postpush.klickwerk.digital/",
-            "logo": "https://postpush.klickwerk.digital/assets/logo.png"
+            "logo": "https://postpush.klickwerk.digital/assets/postpush-icon.png"
           },
           {
             "@type": "WebSite",
@@ -88,7 +89,7 @@
             "publisher": { "@id": "https://postpush.klickwerk.digital/#publisher" },
             "applicationCategory": "UtilitiesApplication",
             "operatingSystem": "Docker, Runtipi",
-            "softwareVersion": "0.2.9",
+            "softwareVersion": "0.2.10",
             "url": "https://postpush.klickwerk.digital/",
             "downloadUrl": "https://github.com/alexholzreiter/postpush",
             "sameAs": "https://github.com/alexholzreiter/postpush",
@@ -152,7 +153,7 @@
     <header class="site-header">
       <nav class="nav shell" aria-label="Main navigation" data-en-aria="Main navigation" data-de-aria="Hauptnavigation">
         <a class="brand" href="#top" aria-label="PostPush home" data-en-aria="PostPush home" data-de-aria="PostPush Startseite">
-          <span class="brand-mark"><img src="assets/logo.png" alt=""></span>
+          <span class="brand-mark"><img src="assets/postpush-icon.png" alt=""></span>
           <span class="brand-copy"><strong>PostPush</strong><small>Mailbox × HomePod</small></span>
         </a>
 
@@ -275,7 +276,7 @@
           <div class="process-grid">
             <article class="process-card reveal"><span class="process-index">01</span><div class="process-visual ring-visual"><span class="mailbox-device"><i></i></span></div><h3 data-en="The sensor detects mail" data-de="Der Sensor erkennt Post">The sensor detects mail</h3><p data-en="Home Assistant publishes a non-retained event to the configured MQTT topic." data-de="Home Assistant veröffentlicht ein nicht gespeichertes Ereignis im konfigurierten MQTT-Topic.">Home Assistant publishes a non-retained event to the configured MQTT topic.</p></article>
             <span class="process-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
-            <article class="process-card reveal"><span class="process-index">02</span><div class="process-visual bridge-visual"><img src="assets/logo.png" alt=""><span></span><span></span></div><h3 data-en="PostPush prepares the message" data-de="PostPush bereitet die Ansage vor">PostPush prepares the message</h3><p data-en="It checks the schedule and cooldown, then uses local speech or the uploaded audio file." data-de="PostPush prüft Zeitplan und Sperrzeit und nutzt dann lokale Sprache oder die hochgeladene Audiodatei.">It checks the schedule and cooldown, then uses local speech or the uploaded audio file.</p></article>
+            <article class="process-card reveal"><span class="process-index">02</span><div class="process-visual bridge-visual"><img src="assets/postpush-icon.png" alt=""><span></span><span></span></div><h3 data-en="PostPush prepares the message" data-de="PostPush bereitet die Ansage vor">PostPush prepares the message</h3><p data-en="It checks the schedule and cooldown, then uses local speech or the uploaded audio file." data-de="PostPush prüft Zeitplan und Sperrzeit und nutzt dann lokale Sprache oder die hochgeladene Audiodatei.">It checks the schedule and cooldown, then uses local speech or the uploaded audio file.</p></article>
             <span class="process-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
             <article class="process-card reveal"><span class="process-index">03</span><div class="process-visual pods-visual"><i></i><i></i><i></i></div><h3 data-en="OwnTone plays in sync" data-de="OwnTone spielt synchron ab">OwnTone plays in sync</h3><p data-en="The announcement plays across the selected AirPlay speakers at the configured volume." data-de="Die Ansage wird mit der eingestellten Lautstärke auf den ausgewählten AirPlay-Geräten abgespielt.">The announcement plays across the selected AirPlay speakers at the configured volume.</p></article>
           </div>
@@ -344,7 +345,7 @@
 
       <section class="final-cta shell reveal">
         <div class="cta-orbit one"></div><div class="cta-orbit two"></div>
-        <img src="assets/logo.png" alt="" class="cta-logo">
+        <img src="assets/postpush-icon.png" alt="" class="cta-logo">
         <span class="section-kicker" data-en="LET THE MAILBOX SPEAK" data-de="LASS DEN BRIEFKASTEN SPRECHEN">LET THE MAILBOX SPEAK</span>
         <h2 data-en="Hear about new mail in every room." data-de="Höre in jedem Raum, wenn neue Post da ist.">Hear about new mail in every room.</h2>
         <p data-en="Free, open source, and ready for your Runtipi or Docker server." data-de="Kostenlos, Open Source und bereit für deinen Runtipi- oder Docker-Server.">Free, open source, and ready for your Runtipi or Docker server.</p>
@@ -353,7 +354,7 @@
     </main>
 
     <footer class="footer shell">
-      <div class="footer-brand"><span class="brand-mark small"><img src="assets/logo.png" alt=""></span><span><strong>PostPush</strong><small data-en="Independent open-source project" data-de="Unabhängiges Open-Source-Projekt">Independent open-source project</small></span></div>
+      <div class="footer-brand"><span class="brand-mark small"><img src="assets/postpush-icon.png" alt=""></span><span><strong>PostPush</strong><small data-en="Independent open-source project" data-de="Unabhängiges Open-Source-Projekt">Independent open-source project</small></span></div>
       <div class="footer-links"><a href="about/" data-en="About" data-de="Über das Projekt">About</a><a href="feed.xml">RSS</a><a href="https://github.com/alexholzreiter/postpush" target="_blank" rel="noopener noreferrer">GitHub</a><a href="https://github.com/alexholzreiter/postpush/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" data-en="MIT License" data-de="MIT-Lizenz">MIT License</a><a href="https://github.com/alexholzreiter/postpush/issues" target="_blank" rel="noopener noreferrer" data-en="Issues" data-de="Probleme melden">Issues</a><a href="https://buy.stripe.com/00w8wOcsV8WHdr7apqaZi04" target="_blank" rel="noopener noreferrer" data-en="Tip a coffee" data-de="Auf einen Kaffee">Tip a coffee</a></div>
       <p>© <span id="year">2026</span> Alexander Holzreiter · <span data-en="Independent project; not affiliated with Apple, Home Assistant, or OwnTone." data-de="Unabhängiges Projekt; nicht mit Apple, Home Assistant oder OwnTone verbunden.">Independent project; not affiliated with Apple, Home Assistant, or OwnTone.</span></p>
     </footer>
