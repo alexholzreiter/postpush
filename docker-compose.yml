@@ -24,7 +24,7 @@ services:
       - ./data:/data
 
   owntone:
-    image: docker.io/owntone/owntone:29.3
+    image: docker.io/owntone/owntone:8dfd6db1@sha256:413dae3d849100c497db7f90fbb3b013981ad6a44c9845e464ddbde895d0cf86
     container_name: postpush-owntone
     restart: unless-stopped
     network_mode: host
@@ -41,6 +41,7 @@ services:
           trusted_networks = { "localhost" }
           ipv6 = no
           cache_dir = "/var/cache/owntone"
+          websocket_port = 3691
           speaker_autoselect = no
           start_buffer_ms = 1000
         }

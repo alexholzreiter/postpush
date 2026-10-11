@@ -63,7 +63,7 @@ test("application, image and Runtipi versions stay synchronized", () => {
   const config = JSON.parse(fs.readFileSync(path.join(storeApp, "config.json"), "utf8"));
   const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
   assert.equal(config.version, version);
-  assert.equal(config.tipi_version, 16);
+  assert.equal(config.tipi_version, 17);
   assert.match(compose, new RegExp(`postpush:${version.replaceAll(".", "\\.")}`));
   assert.match(compose, /schema_version: 2/);
 });
@@ -78,19 +78,22 @@ test("Runtipi fields are valid and secrets use password input", () => {
   assert.equal(config.form_fields.find((field) => field.env_variable === "MQTT_PASSWORD").type, "password");
 });
 
-test("Runtipi package reuses the Ring app's OwnTone service without port conflicts", () => {
+test("Runtipi package runs its own OwnTone without depending on another app", () => {
   const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
   assert.match(compose, /WEB_PORT: "8586"/);
-  assert.match(compose, /OWNTONE_URL: http:\/\/127\.0\.0\.1:3689/);
-  assert.match(compose, /doorbell\/ring-homepod-doorbell\/data\/media:\/data\/media/);
-  assert.doesNotMatch(compose, /^  owntone:/m);
+  assert.match(compose, /OWNTONE_URL: http:\/\/127\.0\.0\.1:3690/);
+  assert.match(compose, /^  owntone:/m);
+  assert.match(compose, /port = 3690/);
+  assert.match(compose, /websocket_port = 3691/);
+  assert.match(compose, /owntone:8dfd6db1@sha256:/);
+  assert.doesNotMatch(compose, /doorbell/i);
+  assert.doesNotMatch(compose, /3689/);
 });
 
-test("Runtipi package does not start a second conflicting mDNS stack", () => {
+test("Runtipi package uses the host mDNS stack instead of starting its own", () => {
   const compose = fs.readFileSync(path.join(storeApp, "docker-compose.yml"), "utf8");
-  assert.doesNotMatch(compose, /depends_on:/);
-  assert.doesNotMatch(compose, /avahi-daemon/);
+  assert.match(compose, /\/var\/run\/dbus\/system_bus_socket:\/run\/dbus\/system_bus_socket/);
+  assert.doesNotMatch(compose, /avahi-daemon --daemonize/);
   assert.doesNotMatch(compose, /dbus-daemon/);
-  assert.doesNotMatch(compose, /healthcheck:/);
   assert.doesNotMatch(compose, /privileged:/);
 });
