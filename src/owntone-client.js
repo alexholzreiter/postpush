@@ -9,6 +9,7 @@ export class OwnToneClient {
     this.baseUrl = baseUrl.replace(/\/$/, "");
     this.fetch = options.fetch ?? globalThis.fetch;
     this.mediaPath = options.mediaPath ?? "/srv/media";
+    this.activationPollDelayMs = options.activationPollDelayMs ?? 250;
     this.retryDelayMs = options.retryDelayMs ?? 1000;
     this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   }
@@ -91,14 +92,26 @@ export class OwnToneClient {
     await this.request(`/api/player/volume?${query}`, { method: "PUT" });
   }
 
+  async toggleOutput(outputId) {
+    await this.request(`/api/outputs/${encodeURIComponent(outputId)}/toggle`, {
+      method: "PUT",
+    });
+  }
+
   async prepareOutputs(outputIds, volume) {
     await this.setOutputs(outputIds);
 
-    // OwnTone's bulk endpoint may still answer with 204 when an AirPlay
-    // connection was not activated. Selecting every requested output once
-    // more through the per-output endpoint makes that failure observable.
-    for (const id of outputIds) {
-      await this.configureOutput(id, { selected: true });
+    // OwnTone's bulk endpoint may answer with 204 even when an AirPlay
+    // connection was not activated. Retry only inactive speakers through the
+    // bodyless toggle endpoint; the JSON per-output endpoint returns HTTP 400
+    // for some AirPlay 2 devices on OwnTone 29.2.
+    const requested = new Set(outputIds.map(String));
+    const outputs = await this.getOutputs(1);
+    const inactiveIds = outputs
+      .filter((output) => requested.has(String(output.id)) && !output.selected)
+      .map((output) => String(output.id));
+    for (const id of inactiveIds) {
+      await this.toggleOutput(id);
     }
 
     await this.waitForSelectedOutputs(outputIds);
@@ -115,7 +128,7 @@ export class OwnToneClient {
         outputs.filter((output) => output.selected).map((output) => String(output.id))
       );
       if ([...requested].every((id) => selected.has(id))) return outputs;
-      if (attempt < attempts - 1) await sleep(250);
+      if (attempt < attempts - 1) await sleep(this.activationPollDelayMs);
     }
     throw new Error(
       "OwnTone konnte die ausgewählten HomePods nicht aktivieren. Prüfe in Apple Home unter „Lautsprecher & TV“, ob Geräte im selben Netzwerk zugreifen dürfen."

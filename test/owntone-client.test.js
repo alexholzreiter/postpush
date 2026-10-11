@@ -23,12 +23,10 @@ test("only ready AirPlay outputs are selected", () => {
 
 test("output preparation selects speakers before setting volume through the player endpoint", async () => {
   const requests = [];
-  let outputsReads = 0;
   const client = new OwnToneClient("http://owntone.test", {
     fetch: async (url, options) => {
       requests.push({ body: options.body, method: options.method, url });
       if (url.endsWith("/api/outputs")) {
-        outputsReads += 1;
         return {
           headers: { get: () => "application/json" },
           ok: true,
@@ -59,14 +57,9 @@ test("output preparation selects speakers before setting volume through the play
       url: "http://owntone.test/api/outputs/set",
     },
     {
-      body: JSON.stringify({ selected: true }),
-      method: "PUT",
-      url: "http://owntone.test/api/outputs/200988995313997",
-    },
-    {
-      body: JSON.stringify({ selected: true }),
-      method: "PUT",
-      url: "http://owntone.test/api/outputs/134524895452726",
+      body: undefined,
+      method: undefined,
+      url: "http://owntone.test/api/outputs",
     },
     {
       body: undefined,
@@ -84,11 +77,48 @@ test("output preparation selects speakers before setting volume through the play
       url: "http://owntone.test/api/player/volume?output_id=134524895452726&volume=55",
     },
   ]);
-  assert.equal(outputsReads, 1);
+});
+
+test("output preparation toggles a speaker when bulk selection did not activate it", async () => {
+  const requests = [];
+  let outputReads = 0;
+  const client = new OwnToneClient("http://owntone.test", {
+    activationPollDelayMs: 0,
+    fetch: async (url, options) => {
+      requests.push({ method: options.method, url });
+      if (url.endsWith("/api/outputs")) {
+        outputReads += 1;
+        return {
+          headers: { get: () => "application/json" },
+          ok: true,
+          status: 200,
+          json: async () => ({
+            outputs: [{ id: "office", selected: outputReads > 1 }],
+          }),
+        };
+      }
+      return {
+        headers: { get: () => "" },
+        ok: true,
+        status: 204,
+        text: async () => "",
+      };
+    },
+  });
+
+  await client.prepareOutputs(["office"], 70);
+
+  assert.ok(
+    requests.some(
+      (request) =>
+        request.method === "PUT" && request.url.endsWith("/api/outputs/office/toggle")
+    )
+  );
 });
 
 test("output preparation fails when OwnTone never activates the requested speaker", async () => {
   const client = new OwnToneClient("http://owntone.test", {
+    activationPollDelayMs: 0,
     retryDelayMs: 0,
     fetch: async (url) => {
       if (url.endsWith("/api/outputs")) {
