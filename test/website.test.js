@@ -34,13 +34,34 @@ test("website exposes GitHub, Runtipi, Docker, and coffee support actions", asyn
 });
 
 test("every translated marketing string includes English and German", async () => {
-  const pages = await Promise.all([read("website/index.html"), read("website/about/index.html")]);
+  const pages = await Promise.all([read("website/index.html"), read("website/about/index.html"), read("website/impressum/index.html")]);
   const translatedElements = pages.flatMap((html) => html.match(/<[^>]+data-en="[^"]*"[^>]*>/g) || []);
   assert.ok(translatedElements.length > 60);
   for (const element of translatedElements) assert.match(element, /data-de="[^"]*"/, element);
 
   const ariaElements = pages.flatMap((html) => html.match(/<[^>]+data-en-aria="[^"]*"[^>]*>/g) || []);
   for (const element of ariaElements) assert.match(element, /data-de-aria="[^"]*"/, element);
+});
+
+test("legal notice mirrors the published provider information and is linked site-wide", async () => {
+  const [home, about, legal, sitemap] = await Promise.all([
+    read("website/index.html"),
+    read("website/about/index.html"),
+    read("website/impressum/index.html"),
+    read("website/sitemap.xml"),
+  ]);
+  assert.match(home, /href="impressum\/" data-en="Legal notice" data-de="Impressum"/);
+  assert.match(about, /href="\.\.\/impressum\/" data-en="Legal notice" data-de="Impressum"/);
+  assert.match(legal, /<title>Legal Notice — PostPush<\/title>/);
+  assert.match(legal, /Laura Wagner \/ klickwerk/);
+  assert.match(legal, /Dörfl 30/);
+  assert.match(legal, /37872786/);
+  assert.match(legal, /\+43 670 60 80 441/);
+  assert.match(about, /\+43 670 60 80 441/);
+  assert.doesNotMatch(home + about + legal, /\+43 677 64314340/);
+  assert.match(legal, /data-en="Legal notice" data-de="Impressum"/);
+  assert.match(legal, /postpush-share\.png/);
+  assert.match(sitemap, /https:\/\/postpush\.klickwerk\.digital\/impressum\//);
 });
 
 test("website references only existing local visual assets", async () => {
