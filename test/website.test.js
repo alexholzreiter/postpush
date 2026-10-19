@@ -65,6 +65,7 @@ test("legal notice mirrors the published provider information and is linked site
   }
   assert.match(legal, /data-en="Legal notice" data-de="Impressum"/);
   assert.match(legal, /postpush-share\.png/);
+  assert.match(legal, /href="\.\.\/styles\.css\?v=20261019-legal"/);
   assert.match(sitemap, /https:\/\/postpush\.klickwerk\.digital\/impressum\//);
 });
 
