@@ -59,6 +59,10 @@ test("legal notice mirrors the published provider information and is linked site
   assert.match(legal, /\+43 670 60 80 441/);
   assert.match(about, /\+43 670 60 80 441/);
   assert.doesNotMatch(home + about + legal, /\+43 677 64314340/);
+  for (const page of [home, about, legal]) {
+    assert.match(page, /data-de="Website betrieben von Laura Wagner \/ klickwerk"/);
+    assert.match(page, /data-de="Nicht mit Ring oder Apple verbunden\."/);
+  }
   assert.match(legal, /data-en="Legal notice" data-de="Impressum"/);
   assert.match(legal, /postpush-share\.png/);
   assert.match(sitemap, /https:\/\/postpush\.klickwerk\.digital\/impressum\//);
